@@ -1,0 +1,69 @@
+appId: com.studiopost.app
+productName: Studio Post
+copyright: Copyright © 2025 Studio Post
+asar: true
+compression: maximum
+directories:
+  output: dist
+  buildResources: build
+files:
+  - electron/**/*.js
+  - electron/**/*.js.map
+  - out/**/*
+  - public/**/*
+  - "!node_modules/**/{test,tests,__tests__,__mocks__}/**"
+  - "!node_modules/**/*.{md,ts,map}"
+extraMetadata:
+  main: electron/main.js
+win:
+  target:
+    - target: nsis
+      arch: [x64, arm64]
+    - target: portable
+      arch: [x64]
+  icon: build/icon.ico
+  artifactName: "${productName}-${version}-win-${arch}.${ext}"
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Studio Post
+mac:
+  target:
+    - target: dmg
+      arch: [x64, arm64]
+    - target: zip
+      arch: [x64, arm64]
+  icon: build/icon.icns
+  category: public.app-category.graphics-design
+  hardenedRuntime: true
+  gatekeeperAssess: false
+  entitlements: build/entitlements.mac.plist
+  entitlementsInherit: build/entitlements.mac.plist
+  artifactName: "${productName}-${version}-mac-${arch}.${ext}"
+dmg:
+  contents:
+    - x: 130
+      y: 220
+    - x: 410
+      y: 220
+      type: link
+      path: /Applications
+linux:
+  target:
+    - target: AppImage
+      arch: [x64, arm64]
+    - target: deb
+      arch: [x64]
+    - target: rpm
+      arch: [x64]
+  icon: build/icons
+  category: Graphics
+  artifactName: "${productName}-${version}-linux-${arch}.${ext}"
+publish:
+  provider: github
+  owner: ${GH_OWNER:-studiopost}
+  repo: ${GH_REPO:-studio-post}
+  releaseType: release
