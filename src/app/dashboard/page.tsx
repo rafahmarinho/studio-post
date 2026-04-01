@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { PlatformIcon } from '@/components/shared/platform-icons'
 import { useAuth } from '@/lib/auth-context'
 import { useCreative } from '@/hooks/use-creative'
 import { Card, CardContent } from '@/components/ui/card'
@@ -121,7 +122,7 @@ export default function DashboardPage() {
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between mb-2">
                       <Badge variant="secondary">
-                        {platformInfo.emoji} {platformInfo.label}
+                        <PlatformIcon platform={g.platform} size={14} colored /> {platformInfo.label}
                       </Badge>
                       <span className="text-xs text-muted-foreground">
                         {g.generatedImageUrls.length} img

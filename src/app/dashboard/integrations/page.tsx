@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import Image from 'next/image'
 import { useAuth } from '@/lib/auth-context'
 import { useCreative } from '@/hooks/use-creative'
+import { PlatformIcon } from '@/components/shared/platform-icons'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -277,9 +278,11 @@ export default function IntegrationsPage() {
                     <CardContent className="flex items-center gap-4 py-4">
                       {/* Avatar / Icon */}
                       <div className="h-12 w-12 rounded-full bg-linear-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white shrink-0">
-                        <span className="text-lg font-bold">
-                          {conn.accountType === 'instagram_business' ? '📸' : '👍'}
-                        </span>
+                        <PlatformIcon
+                          platform={conn.accountType === 'instagram_business' ? 'instagram' : 'facebook'}
+                          size={22}
+                          className="text-white"
+                        />
                       </div>
 
                       <div className="flex-1 min-w-0">

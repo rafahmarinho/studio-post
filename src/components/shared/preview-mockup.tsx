@@ -15,7 +15,7 @@ import {
   MOCKUP_PLATFORM_LABELS,
 } from '@/types'
 import type { MockupDevice, MockupPlatform } from '@/types'
-import { Heart, MessageCircle, Send, Bookmark, MoreHorizontal, ThumbsUp, Share2 } from 'lucide-react'
+import { Heart, MessageCircle, Send, Bookmark, MoreHorizontal, ThumbsUp, Share2, Globe } from 'lucide-react'
 import Image from 'next/image'
 
 interface PreviewMockupProps {
@@ -131,7 +131,7 @@ export function PreviewMockup({ imageUrl, caption, accountName = 'studiopost', a
             <div className="flex-1">
               <span className="text-sm font-semibold">{accountName}</span>
               <div className="flex items-center gap-1">
-                <span className={`text-xs ${mutedText}`}>2h · 🌐</span>
+                <span className={`text-xs ${mutedText} flex items-center gap-1`}>2h · <Globe className="h-3 w-3 inline" /></span>
               </div>
             </div>
             <MoreHorizontal className="h-5 w-5" />
@@ -148,7 +148,7 @@ export function PreviewMockup({ imageUrl, caption, accountName = 'studiopost', a
           </div>
           {/* Reactions bar */}
           <div className={`flex items-center justify-between px-3 py-2 border-b ${borderColor}`}>
-            <span className={`text-xs ${mutedText}`}>👍❤️ 42</span>
+            <span className={`text-xs ${mutedText} flex items-center gap-1`}><ThumbsUp className="h-3 w-3" /><Heart className="h-3 w-3" /> 42</span>
             <span className={`text-xs ${mutedText}`}>5 comentários</span>
           </div>
           {/* Actions */}
@@ -207,7 +207,7 @@ export function PreviewMockup({ imageUrl, caption, accountName = 'studiopost', a
             <Image src={imageUrl} alt="" width={600} height={600} className="w-full object-cover" />
           </div>
           <div className={`flex items-center gap-2 px-3 py-2 border-b ${borderColor}`}>
-            <span className={`text-xs ${mutedText}`}>👍 18 · 3 comentários</span>
+            <span className={`text-xs ${mutedText} flex items-center gap-1`}><ThumbsUp className="h-3 w-3" /> 18 · 3 comentários</span>
           </div>
           <div className={`flex items-center justify-around py-2`}>
             <button className={`flex items-center gap-1.5 text-xs ${mutedText}`}>

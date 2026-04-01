@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { Button } from '@/components/ui/button'
+import { PlatformIcon } from '@/components/shared/platform-icons'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
@@ -285,7 +286,7 @@ export default function TemplatesPage() {
                     </Badge>
                     {tpl.fields.platform && (
                       <Badge variant="outline">
-                        {PLATFORM_CONFIG[tpl.fields.platform]?.emoji}{' '}
+                        <PlatformIcon platform={tpl.fields.platform} size={14} colored />{' '}
                         {PLATFORM_CONFIG[tpl.fields.platform]?.label}
                       </Badge>
                     )}
@@ -365,7 +366,7 @@ export default function TemplatesPage() {
                   <SelectContent>
                     {Object.entries(PLATFORM_CONFIG).map(([key, config]) => (
                       <SelectItem key={key} value={key}>
-                        {config.emoji} {config.label}
+                        <PlatformIcon platform={key} size={14} colored /> {config.label}
                       </SelectItem>
                     ))}
                   </SelectContent>

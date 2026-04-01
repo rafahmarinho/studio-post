@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useAuth } from '@/lib/auth-context'
+import { PlatformIcon } from '@/components/shared/platform-icons'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Select,
@@ -163,8 +164,9 @@ export default function ReportsPage() {
                       return (
                         <div key={platform} className="space-y-1">
                           <div className="flex items-center justify-between text-sm">
-                            <span>
-                              {config?.emoji || '🌐'} {config?.label || platform}
+                            <span className="flex items-center gap-2">
+                              <PlatformIcon platform={platform} size={16} />
+                              {config?.label || platform}
                             </span>
                             <span className="text-muted-foreground">
                               {count} ({percentage}%)

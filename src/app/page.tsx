@@ -4,6 +4,8 @@ import { useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
 import { useScrollReveal, useScrollRevealBatch } from '@/hooks/use-scroll-reveal'
+import { PlatformIcon } from '@/components/shared/platform-icons'
+import type { ContentPlatform } from '@/types'
 import { Button } from '@/components/ui/button'
 import {
   Sparkles,
@@ -68,15 +70,15 @@ const FEATURES = [
   },
 ]
 
-const PLATFORMS = [
-  { name: 'Instagram', emoji: '📸' },
-  { name: 'Facebook', emoji: '👍' },
-  { name: 'LinkedIn', emoji: '💼' },
-  { name: 'TikTok', emoji: '🎵' },
-  { name: 'YouTube', emoji: '▶️' },
-  { name: 'Pinterest', emoji: '📌' },
-  { name: 'Blog', emoji: '📝' },
-  { name: 'E-mail', emoji: '📧' },
+const PLATFORMS: { name: string; key: ContentPlatform }[] = [
+  { name: 'Instagram', key: 'instagram' },
+  { name: 'Facebook', key: 'facebook' },
+  { name: 'LinkedIn', key: 'linkedin' },
+  { name: 'TikTok', key: 'tiktok' },
+  { name: 'YouTube', key: 'youtube' },
+  { name: 'Pinterest', key: 'pinterest' },
+  { name: 'Blog', key: 'blog' },
+  { name: 'E-mail', key: 'email' },
 ]
 
 export default function LandingPage() {
@@ -224,8 +226,8 @@ export default function LandingPage() {
             <p className="section-label text-center mb-6">Otimizado para todas as plataformas</p>
             <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
               {PLATFORMS.map((p) => (
-                <span key={p.name} className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                  <span className="text-lg">{p.emoji}</span>
+                <span key={p.name} className="flex items-center gap-2.5 text-sm font-medium text-muted-foreground">
+                  <PlatformIcon platform={p.key} size={20} colored />
                   {p.name}
                 </span>
               ))}

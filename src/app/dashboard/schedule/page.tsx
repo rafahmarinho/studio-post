@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import Image from 'next/image'
 import { useAuth } from '@/lib/auth-context'
 import { useCreative } from '@/hooks/use-creative'
+import { PlatformIcon } from '@/components/shared/platform-icons'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -301,7 +302,7 @@ export default function SchedulePage() {
                         {SCHEDULE_STATUS_LABELS[post.status]}
                       </Badge>
                       <Badge variant="secondary">
-                        {platformConf?.emoji} {platformConf?.label}
+                        <PlatformIcon platform={post.platform} size={14} colored /> {platformConf?.label}
                       </Badge>
                     </div>
                     <p className="text-sm text-muted-foreground">
@@ -412,8 +413,12 @@ export default function SchedulePage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="instagram">📸 Instagram</SelectItem>
-                  <SelectItem value="facebook">👍 Facebook</SelectItem>
+                  <SelectItem value="instagram">
+                    <span className="flex items-center gap-2"><PlatformIcon platform="instagram" size={14} /> Instagram</span>
+                  </SelectItem>
+                  <SelectItem value="facebook">
+                    <span className="flex items-center gap-2"><PlatformIcon platform="facebook" size={14} /> Facebook</span>
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>

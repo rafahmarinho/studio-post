@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { useAuth } from '@/lib/auth-context'
+import { PlatformIcon } from '@/components/shared/platform-icons'
 import { useCreative } from '@/hooks/use-creative'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -105,7 +106,7 @@ export default function HistoryPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3 min-w-0">
                       <Badge variant="secondary">
-                        {platformInfo.emoji} {platformInfo.label}
+                        <PlatformIcon platform={g.platform} size={14} colored /> {platformInfo.label}
                       </Badge>
                       <Badge variant="outline">{formatInfo.label}</Badge>
                       <Badge

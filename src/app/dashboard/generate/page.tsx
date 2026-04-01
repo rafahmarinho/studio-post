@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { useCreative } from '@/hooks/use-creative'
+import { PlatformIcon } from '@/components/shared/platform-icons'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -259,7 +260,7 @@ export default function GeneratePage() {
                             }
                           }}
                         >
-                          {cfg.emoji} {cfg.label}
+                          <PlatformIcon platform={key} size={16} colored /> {cfg.label}
                         </button>
                       )
                     )}
