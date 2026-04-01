@@ -55,9 +55,9 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="p-6 space-y-6 max-w-2xl">
+    <div className="p-6 lg:p-8 space-y-6 max-w-2xl">
       <div>
-        <h1 className="text-2xl font-bold">Configurações</h1>
+        <h1 className="page-header">Configurações</h1>
         <p className="text-muted-foreground">
           Gerencie seu perfil e chaves de API
         </p>
@@ -84,7 +84,7 @@ export default function SettingsPage() {
             <Label>E-mail</Label>
             <Input value={user?.email || ''} disabled />
           </div>
-          <Button onClick={handleSaveProfile} disabled={saving} className="gap-2">
+          <Button onClick={handleSaveProfile} disabled={saving} className="gap-2 gradient-primary border-0 text-white">
             <Save className="h-4 w-4" />
             Salvar Perfil
           </Button>
@@ -180,7 +180,7 @@ export default function SettingsPage() {
               </a>
             </p>
           </div>
-          <Button onClick={handleSaveKeys} disabled={saving} className="gap-2">
+          <Button onClick={handleSaveKeys} disabled={saving} className="gap-2 gradient-primary border-0 text-white">
             <Save className="h-4 w-4" />
             Salvar Chaves
           </Button>

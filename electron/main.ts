@@ -47,7 +47,7 @@ async function initAutoUpdater() {
     autoUpdater.autoDownload = false
     autoUpdater.autoInstallOnAppQuit = true
 
-    autoUpdater.on('update-available', (info) => {
+    autoUpdater.on('update-available', (info: { version: string }) => {
       if (!mainWindow) return
       dialog
         .showMessageBox(mainWindow, {
@@ -57,7 +57,7 @@ async function initAutoUpdater() {
           buttons: ['Baixar', 'Mais tarde'],
           defaultId: 0,
         })
-        .then(({ response }) => {
+        .then(({ response }: { response: number }) => {
           if (response === 0) {
             autoUpdater!.downloadUpdate()
             mainWindow?.webContents.send('update:downloading')
@@ -75,7 +75,7 @@ async function initAutoUpdater() {
           buttons: ['Reiniciar', 'Mais tarde'],
           defaultId: 0,
         })
-        .then(({ response }) => {
+        .then(({ response }: { response: number }) => {
           if (response === 0) {
             isQuitting = true
             autoUpdater!.quitAndInstall()
@@ -83,12 +83,12 @@ async function initAutoUpdater() {
         })
     })
 
-    autoUpdater.on('download-progress', (progress) => {
+    autoUpdater.on('download-progress', (progress: { percent: number }) => {
       mainWindow?.webContents.send('update:progress', progress.percent)
       mainWindow?.setProgressBar(progress.percent / 100)
     })
 
-    autoUpdater.on('error', (err) => {
+    autoUpdater.on('error', (err: Error) => {
       console.error('Auto-updater error:', err)
     })
 
@@ -205,7 +205,7 @@ function createWindow() {
   mainWindow.loadURL(url)
 
   // Security: only open http(s) links in external browser
-  mainWindow.webContents.setWindowOpenHandler(({ url: linkUrl }) => {
+  mainWindow.webContents.setWindowOpenHandler(({ url: linkUrl }: { url: string }) => {
     if (linkUrl.startsWith('http://') || linkUrl.startsWith('https://')) {
       shell.openExternal(linkUrl)
     }
@@ -213,7 +213,7 @@ function createWindow() {
   })
 
   // Prevent navigation away from app
-  mainWindow.webContents.on('will-navigate', (event, navUrl) => {
+  mainWindow.webContents.on('will-navigate', (event: { preventDefault: () => void }, navUrl: string) => {
     const parsedUrl = new URL(navUrl)
     const appUrl = isDev ? 'localhost' : ''
     if (parsedUrl.hostname !== appUrl && parsedUrl.protocol !== 'file:') {
@@ -227,7 +227,7 @@ function createWindow() {
   }
 
   // Minimize to tray instead of closing
-  mainWindow.on('close', (event) => {
+  mainWindow.on('close', (event: { preventDefault: () => void }) => {
     if (!isQuitting) {
       event.preventDefault()
       mainWindow?.hide()
@@ -253,7 +253,7 @@ ipcMain.handle('update:check', async () => {
   return null
 })
 
-ipcMain.handle('dialog:save', async (_event, options: Electron.SaveDialogOptions) => {
+ipcMain.handle('dialog:save', async (_event: unknown, options: { defaultPath?: string; filters?: { name: string; extensions: string[] }[] }) => {
   if (!mainWindow) return null
   const result = await dialog.showSaveDialog(mainWindow, options)
   return result.canceled ? null : result.filePath

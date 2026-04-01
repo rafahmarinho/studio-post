@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef, useCallback } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
@@ -14,11 +14,12 @@ import {
   Settings,
   LogOut,
   Menu,
-  X,
   Palette,
   LayoutTemplate,
   Building2,
   BarChart3,
+  ChevronsLeft,
+  ChevronsRight,
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -34,6 +35,8 @@ const NAV_ITEMS = [
   { href: '/dashboard/settings', label: 'Configurações', icon: Settings },
 ]
 
+const COLLAPSE_DELAY = 3000
+
 export default function DashboardLayout({
   children,
 }: {
@@ -42,7 +45,47 @@ export default function DashboardLayout({
   const { user, loading, signOut } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const [collapsed, setCollapsed] = useState(false)
+  const [hovered, setHovered] = useState(false)
+  const collapseTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // Auto-collapse after inactivity
+  const resetCollapseTimer = useCallback(() => {
+    if (collapseTimer.current) clearTimeout(collapseTimer.current)
+    collapseTimer.current = setTimeout(() => {
+      setCollapsed(true)
+      setHovered(false)
+    }, COLLAPSE_DELAY)
+  }, [])
+
+  // Start auto-collapse timer on mount
+  useEffect(() => {
+    resetCollapseTimer()
+    return () => {
+      if (collapseTimer.current) clearTimeout(collapseTimer.current)
+    }
+  }, [resetCollapseTimer])
+
+  const handleSidebarEnter = () => {
+    if (collapseTimer.current) clearTimeout(collapseTimer.current)
+    setHovered(true)
+  }
+
+  const handleSidebarLeave = () => {
+    setHovered(false)
+    resetCollapseTimer()
+  }
+
+  const toggleCollapse = () => {
+    setCollapsed((prev) => !prev)
+    if (collapseTimer.current) clearTimeout(collapseTimer.current)
+    // If expanding manually, restart the timer
+    if (collapsed) resetCollapseTimer()
+  }
+
+  // Effective expanded state: not collapsed OR hovering while collapsed
+  const isExpanded = !collapsed || hovered
 
   useEffect(() => {
     if (!loading && !user) {
@@ -52,8 +95,13 @@ export default function DashboardLayout({
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-10 w-10 gradient-primary rounded-xl flex items-center justify-center text-white animate-pulse">
+            <Sparkles className="h-5 w-5" />
+          </div>
+          <div className="animate-spin h-6 w-6 border-3 border-primary border-t-transparent rounded-full" />
+        </div>
       </div>
     )
   }
@@ -61,91 +109,152 @@ export default function DashboardLayout({
   if (!user) return null
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-background">
       {/* Mobile overlay */}
-      {sidebarOpen && (
+      {mobileOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
+          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden animate-in fade-in duration-200"
+          onClick={() => setMobileOpen(false)}
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar — desktop: fixed 100vh, auto-collapse with hover expand */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-card border-r transform transition-transform lg:translate-x-0 lg:static lg:z-auto ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        onMouseEnter={handleSidebarEnter}
+        onMouseLeave={handleSidebarLeave}
+        className={`
+          fixed inset-y-0 left-0 z-50 h-screen
+          bg-sidebar border-r border-sidebar-border
+          flex flex-col
+          transition-all duration-300 ease-[cubic-bezier(.22,1,.36,1)]
+          ${isExpanded ? 'w-60' : 'w-15'}
+          ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}
+          lg:translate-x-0
+        `}
       >
-        <div className="flex flex-col h-full">
-          <div className="flex items-center justify-between h-16 px-4 border-b">
-            <Link href="/dashboard" className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-primary" />
-              <span className="font-bold">Studio Post</span>
-            </Link>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="lg:hidden"
-              onClick={() => setSidebarOpen(false)}
+        {/* Logo area */}
+        <div className={`flex items-center h-14 border-b border-sidebar-border shrink-0 ${isExpanded ? 'px-4 justify-between' : 'px-0 justify-center'}`}>
+          <Link href="/dashboard" className="flex items-center gap-2.5 min-w-0">
+            <div className="h-8 w-8 gradient-primary rounded-lg flex items-center justify-center text-white shrink-0">
+              <Sparkles className="h-4 w-4" />
+            </div>
+            <span
+              className={`font-bold text-sm text-sidebar-foreground whitespace-nowrap transition-all duration-300 ${
+                isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0 overflow-hidden'
+              }`}
             >
-              <X className="h-5 w-5" />
-            </Button>
-          </div>
+              Studio Post
+            </span>
+          </Link>
+          {/* Collapse toggle — only visible on desktop when expanded */}
+          <button
+            onClick={toggleCollapse}
+            className={`hidden lg:flex items-center justify-center h-7 w-7 rounded-md text-sidebar-foreground/50 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-all duration-200 ${
+              isExpanded ? 'opacity-100' : 'opacity-0 pointer-events-none'
+            }`}
+            title={collapsed ? 'Expandir sidebar' : 'Recolher sidebar'}
+          >
+            <ChevronsLeft className="h-4 w-4" />
+          </button>
+        </div>
 
-          <nav className="flex-1 p-4 space-y-1">
-            {NAV_ITEMS.map((item) => {
-              const isActive = pathname === item.href
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setSidebarOpen(false)}
-                  className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
+        {/* Expand button when collapsed — centered icon */}
+        {!isExpanded && (
+          <button
+            onClick={toggleCollapse}
+            className="hidden lg:flex items-center justify-center h-8 w-8 mx-auto mt-2 rounded-md text-sidebar-foreground/50 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors duration-200"
+            title="Expandir sidebar"
+          >
+            <ChevronsRight className="h-4 w-4" />
+          </button>
+        )}
+
+        {/* Navigation */}
+        <nav className={`flex-1 py-3 space-y-0.5 overflow-y-auto overflow-x-hidden ${isExpanded ? 'px-2.5' : 'px-1.5'}`}>
+          {NAV_ITEMS.map((item) => {
+            const isActive = pathname === item.href
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setMobileOpen(false)}
+                title={!isExpanded ? item.label : undefined}
+                className={`
+                  flex items-center gap-3 rounded-lg text-sm font-medium
+                  transition-all duration-200
+                  ${isExpanded ? 'px-3 py-2.5' : 'px-0 py-2.5 justify-center'}
+                  ${
                     isActive
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                      ? 'bg-sidebar-accent text-sidebar-accent-foreground font-semibold'
+                      : 'text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/40'
+                  }
+                `}
+              >
+                <item.icon className={`h-4.5 w-4.5 shrink-0 ${isActive ? 'text-primary' : ''}`} />
+                <span
+                  className={`whitespace-nowrap transition-all duration-300 ${
+                    isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0 overflow-hidden'
                   }`}
                 >
-                  <item.icon className="h-4 w-4" />
                   {item.label}
-                </Link>
-              )
-            })}
-          </nav>
+                </span>
+              </Link>
+            )
+          })}
+        </nav>
 
-          <div className="p-4 border-t">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-sm font-medium text-primary">
+        {/* User section */}
+        <div className={`border-t border-sidebar-border shrink-0 ${isExpanded ? 'p-3' : 'p-1.5'}`}>
+          {isExpanded ? (
+            <>
+              <div className="flex items-center gap-3 px-2 py-2 mb-1">
+                <div className="h-9 w-9 rounded-full gradient-primary flex items-center justify-center text-sm font-semibold text-white shrink-0">
+                  {user.displayName?.charAt(0) || user.email?.charAt(0) || '?'}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate text-sidebar-foreground">{user.displayName || 'Usuário'}</p>
+                  <p className="text-xs truncate text-sidebar-foreground/50">{user.email}</p>
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full justify-start gap-2 text-sidebar-foreground/50 hover:text-red-500 hover:bg-red-500/10 transition-colors"
+                onClick={() => signOut()}
+              >
+                <LogOut className="h-4 w-4" />
+                Sair
+              </Button>
+            </>
+          ) : (
+            <div className="flex flex-col items-center gap-2 py-1">
+              <div className="h-8 w-8 rounded-full gradient-primary flex items-center justify-center text-xs font-semibold text-white">
                 {user.displayName?.charAt(0) || user.email?.charAt(0) || '?'}
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">{user.displayName || 'Usuário'}</p>
-                <p className="text-xs text-muted-foreground truncate">{user.email}</p>
-              </div>
+              <button
+                onClick={() => signOut()}
+                className="flex items-center justify-center h-8 w-8 rounded-md text-sidebar-foreground/40 hover:text-red-500 hover:bg-red-500/10 transition-colors"
+                title="Sair"
+              >
+                <LogOut className="h-4 w-4" />
+              </button>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full justify-start gap-2 text-muted-foreground"
-              onClick={() => signOut()}
-            >
-              <LogOut className="h-4 w-4" />
-              Sair
-            </Button>
-          </div>
+          )}
         </div>
       </aside>
 
-      {/* Main content */}
-      <div className="flex-1 flex flex-col min-w-0">
+      {/* Main content — offset by sidebar width */}
+      <div className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ease-[cubic-bezier(.22,1,.36,1)] ${collapsed && !hovered ? 'lg:ml-15' : 'lg:ml-60'}`}>
         {/* Mobile header */}
-        <header className="h-16 border-b flex items-center px-4 lg:hidden">
-          <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(true)}>
+        <header className="h-14 border-b flex items-center px-4 lg:hidden bg-background/80 backdrop-blur-sm sticky top-0 z-30">
+          <Button variant="ghost" size="icon" onClick={() => setMobileOpen(true)}>
             <Menu className="h-5 w-5" />
           </Button>
           <div className="flex items-center gap-2 ml-3">
-            <Sparkles className="h-5 w-5 text-primary" />
-            <span className="font-bold">Studio Post</span>
+            <div className="h-7 w-7 gradient-primary rounded-md flex items-center justify-center text-white">
+              <Sparkles className="h-3.5 w-3.5" />
+            </div>
+            <span className="font-bold text-sm">Studio Post</span>
           </div>
         </header>
 

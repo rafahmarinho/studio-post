@@ -7,8 +7,7 @@ import { useAuth } from '@/lib/auth-context'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Sparkles } from 'lucide-react'
+import { Sparkles, Image as ImageIcon, MessageSquare, Layers } from 'lucide-react'
 import { toast } from 'sonner'
 
 export default function LoginPage() {
@@ -44,17 +43,55 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <Sparkles className="h-6 w-6 text-primary" />
+    <div className="flex min-h-screen">
+      {/* Left branding panel */}
+      <div className="hidden lg:flex lg:w-1/2 gradient-primary relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,.08),transparent)]" />
+        <div className="relative flex flex-col justify-between p-12 text-white">
+          <Link href="/" className="flex items-center gap-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/15">
+              <Sparkles className="h-5 w-5" />
+            </div>
             <span className="text-xl font-bold">Studio Post</span>
+          </Link>
+          <div>
+            <h2 className="text-3xl font-bold mb-4 leading-tight">
+              Criativos profissionais<br />em escala com IA
+            </h2>
+            <p className="text-white/70 text-lg mb-10">Gemini para imagens. ChatGPT para copy. Tudo em um lugar.</p>
+            <div className="space-y-4">
+              {[
+                { icon: ImageIcon, text: 'Até 30 imagens por lote com variação automática' },
+                { icon: MessageSquare, text: 'Legendas otimizadas por plataforma' },
+                { icon: Layers, text: 'Carrosséis com storytelling visual' },
+              ].map((item) => (
+                <div key={item.text} className="flex items-center gap-3 text-sm text-white/80">
+                  <div className="h-8 w-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
+                    <item.icon className="h-4 w-4" />
+                  </div>
+                  {item.text}
+                </div>
+              ))}
+            </div>
           </div>
-          <CardTitle>Entrar na sua conta</CardTitle>
-          <CardDescription>Use sua conta Google ou e-mail para continuar</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
+          <p className="text-white/40 text-sm">Open Source — MIT License</p>
+        </div>
+      </div>
+
+      {/* Right form panel */}
+      <div className="flex-1 flex items-center justify-center px-6 py-12 bg-background">
+        <div className="w-full max-w-sm space-y-8">
+          <div className="lg:hidden flex items-center justify-center gap-2 mb-4">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg gradient-primary text-white">
+              <Sparkles className="h-4 w-4" />
+            </div>
+            <span className="text-lg font-bold">Studio Post</span>
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">Entrar na sua conta</h1>
+            <p className="text-muted-foreground text-sm mt-1">Use Google ou e-mail para continuar</p>
+          </div>
+          <div className="space-y-4">
           <Button
             variant="outline"
             className="w-full"
@@ -101,6 +138,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                className="h-11"
               />
             </div>
             <div className="space-y-2">
@@ -112,21 +150,23 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                className="h-11"
               />
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full h-11 gradient-primary border-0 text-white" disabled={loading}>
               {loading ? 'Entrando...' : 'Entrar'}
             </Button>
           </form>
 
           <p className="text-center text-sm text-muted-foreground">
             Não tem conta?{' '}
-            <Link href="/register" className="text-primary hover:underline">
-              Criar conta
+            <Link href="/register" className="text-primary font-medium hover:underline">
+              Criar conta grátis
             </Link>
           </p>
-        </CardContent>
-      </Card>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

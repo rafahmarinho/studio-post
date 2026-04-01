@@ -32,10 +32,20 @@ export function calculateTotalCost(mode: GenerationMode, quantity: number): numb
 }
 
 export function formatCurrency(cents: number): string {
-  return (cents / 100).toLocaleString('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
-  })
+  const value = Math.abs(cents / 100)
+    .toFixed(2)
+    .replace('.', ',')
+    .replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+  return `${cents < 0 ? '-' : ''}R$\u00A0${value}`
+}
+
+/** Deterministic date formatter (dd/mm/yyyy) — avoids hydration mismatches from Intl */
+export function formatDateBR(date: Date | { seconds: number }): string {
+  const d = date instanceof Date ? date : new Date((date as { seconds: number }).seconds * 1000)
+  const day = d.getDate().toString().padStart(2, '0')
+  const month = (d.getMonth() + 1).toString().padStart(2, '0')
+  const year = d.getFullYear()
+  return `${day}/${month}/${year}`
 }
 
 // ==================== VARIAÇÕES (IMAGEM) ====================

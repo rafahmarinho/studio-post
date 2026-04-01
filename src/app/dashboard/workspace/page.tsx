@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useAuth } from '@/lib/auth-context'
+import { formatDateBR } from '@/lib/constants'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -313,9 +314,9 @@ export default function WorkspacePage() {
   }
 
   return (
-    <div className="p-6 max-w-6xl mx-auto space-y-6">
+    <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Workspace</h1>
+        <h1 className="page-header">Workspace</h1>
         <p className="text-muted-foreground">
           Gerencie workspaces, membros e chaves de API
         </p>
@@ -516,7 +517,7 @@ export default function WorkspacePage() {
                       </p>
                       <p className="text-xs text-muted-foreground">
                         Rate limit: {key.rateLimit}/min
-                        {key.lastUsedAt && ` · Último uso: ${new Date(key.lastUsedAt).toLocaleDateString('pt-BR')}`}
+                        {key.lastUsedAt && ` · Último uso: ${formatDateBR(new Date(key.lastUsedAt))}`}
                       </p>
                     </div>
                     <Button

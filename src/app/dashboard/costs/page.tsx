@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { useAuth } from '@/lib/auth-context'
 import { useCreative } from '@/hooks/use-creative'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { formatCurrency } from '@/lib/constants'
+import { formatCurrency, formatDateBR } from '@/lib/constants'
 import { DollarSign, Image as ImageIcon, Users, TrendingUp } from 'lucide-react'
 
 export default function CostsPage() {
@@ -17,13 +17,15 @@ export default function CostsPage() {
 
   if (userDoc?.tier === 'own_keys') {
     return (
-      <div className="p-6">
-        <h1 className="text-2xl font-bold mb-2">Custos</h1>
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-            <DollarSign className="h-12 w-12 text-muted-foreground/50 mb-4" />
+      <div className="p-6 lg:p-8">
+        <h1 className="page-header mb-4">Custos</h1>
+        <Card className="border-dashed">
+          <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="h-14 w-14 rounded-2xl bg-muted flex items-center justify-center mb-4">
+              <DollarSign className="h-7 w-7 text-muted-foreground" />
+            </div>
             <h3 className="text-lg font-semibold mb-2">Modo BYO Keys</h3>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground max-w-sm">
               Você está usando suas próprias chaves de API. Os custos são
               cobrados diretamente pelo provedor da API.
             </p>
@@ -34,9 +36,9 @@ export default function CostsPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 lg:p-8 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Custos</h1>
+        <h1 className="page-header">Custos</h1>
         <p className="text-muted-foreground">
           Dashboard administrativo de custos da plataforma
         </p>
@@ -50,45 +52,33 @@ export default function CostsPage() {
         <>
           {/* Summary stats */}
           <div className="grid gap-4 md:grid-cols-3">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Custo Total
-                </CardTitle>
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {formatCurrency(costsSummary.totalCost)}
+            <div className="stat-card">
+              <div className="flex items-center justify-between">
+                <span className="section-label">Custo Total</span>
+                <div className="h-9 w-9 rounded-lg bg-red-500/10 flex items-center justify-center">
+                  <DollarSign className="h-4 w-4 text-red-500" />
                 </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Imagens Geradas
-                </CardTitle>
-                <ImageIcon className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {costsSummary.totalImages}
+              </div>
+              <p className="text-3xl font-bold mt-2">{formatCurrency(costsSummary.totalCost)}</p>
+            </div>
+            <div className="stat-card">
+              <div className="flex items-center justify-between">
+                <span className="section-label">Imagens Geradas</span>
+                <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <ImageIcon className="h-4 w-4 text-primary" />
                 </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Usuários
-                </CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {costsSummary.byUser.length}
+              </div>
+              <p className="text-3xl font-bold mt-2">{costsSummary.totalImages}</p>
+            </div>
+            <div className="stat-card">
+              <div className="flex items-center justify-between">
+                <span className="section-label">Usuários</span>
+                <div className="h-9 w-9 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                  <Users className="h-4 w-4 text-emerald-500" />
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+              <p className="text-3xl font-bold mt-2">{costsSummary.byUser.length}</p>
+            </div>
           </div>
 
           {/* Per-user breakdown */}
@@ -127,7 +117,7 @@ export default function CostsPage() {
                               {formatCurrency(u.totalCost)}
                             </td>
                             <td className="py-3 px-2 text-right text-muted-foreground">
-                              {lastGen.toLocaleDateString('pt-BR')}
+                              {formatDateBR(lastGen)}
                             </td>
                           </tr>
                         )

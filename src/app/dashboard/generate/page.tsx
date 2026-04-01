@@ -195,16 +195,16 @@ export default function GeneratePage() {
     imageFormat === 'carousel' ? carouselCount * imagesPerCarousel : totalImages
 
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-6">
+    <div className="p-6 lg:p-8">
+      <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold">Gerar Criativos</h1>
+          <h1 className="page-header">Gerar Criativos</h1>
           <p className="text-muted-foreground">
             Preencha o brief ou use a IA para gerar automaticamente
           </p>
         </div>
-        <Button variant="outline" className="gap-2" onClick={() => setIdeaOpen(true)}>
-          <Lightbulb className="h-4 w-4" />
+        <Button variant="outline" className="gap-2 hover-lift group hover:bg-orange-500 hover:text-white hover:border-orange-500 transition-colors" onClick={() => setIdeaOpen(true)}>
+          <Lightbulb className="h-4 w-4 text-orange-500 group-hover:text-white transition-colors" />
           Preencher com IA
         </Button>
       </div>
@@ -216,21 +216,20 @@ export default function GeneratePage() {
             {/* Generation mode */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Modo de Geração</CardTitle>
+                <CardTitle className="text-base flex items-center gap-2"><Wand2 className="h-4 w-4 text-primary" /> Modo de Geração</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
                   {(Object.entries(GENERATION_MODE_LABELS) as [GenerationMode, string][]).map(
                     ([key, label]) => (
-                      <Button
+                      <button
                         key={key}
                         type="button"
-                        variant={generationMode === key ? 'default' : 'outline'}
-                        size="sm"
+                        className={`chip-toggle ${generationMode === key ? 'active' : ''}`}
                         onClick={() => setGenerationMode(key)}
                       >
                         {label}
-                      </Button>
+                      </button>
                     )
                   )}
                 </div>
@@ -248,11 +247,10 @@ export default function GeneratePage() {
                   <div className="flex flex-wrap gap-2 mt-2">
                     {(Object.entries(PLATFORM_CONFIG) as [ContentPlatform, typeof PLATFORM_CONFIG[ContentPlatform]][]).map(
                       ([key, cfg]) => (
-                        <Button
+                        <button
                           key={key}
                           type="button"
-                          variant={platform === key ? 'default' : 'outline'}
-                          size="sm"
+                          className={`chip-toggle ${platform === key ? 'active' : ''}`}
                           onClick={() => {
                             setPlatform(key)
                             const formats = PLATFORM_IMAGE_FORMATS[key]
@@ -262,7 +260,7 @@ export default function GeneratePage() {
                           }}
                         >
                           {cfg.emoji} {cfg.label}
-                        </Button>
+                        </button>
                       )
                     )}
                   </div>
@@ -273,15 +271,14 @@ export default function GeneratePage() {
                     {availableFormats.map((fmt) => {
                       const cfg = IMAGE_FORMAT_CONFIG[fmt]
                       return (
-                        <Button
+                        <button
                           key={fmt}
                           type="button"
-                          variant={imageFormat === fmt ? 'default' : 'outline'}
-                          size="sm"
+                          className={`chip-toggle ${imageFormat === fmt ? 'active' : ''}`}
                           onClick={() => setImageFormat(fmt)}
                         >
                           {cfg.label} ({cfg.aspectRatio})
-                        </Button>
+                        </button>
                       )
                     })}
                   </div>
@@ -388,15 +385,14 @@ export default function GeneratePage() {
                   <Label>Tom</Label>
                   <div className="flex flex-wrap gap-2 mt-2">
                     {(Object.entries(TONE_LABELS) as [ToneType, string][]).map(([key, label]) => (
-                      <Button
+                      <button
                         key={key}
                         type="button"
-                        variant={tone === key ? 'default' : 'outline'}
-                        size="sm"
+                        className={`chip-toggle ${tone === key ? 'active' : ''}`}
                         onClick={() => setTone(key)}
                       >
                         {label}
-                      </Button>
+                      </button>
                     ))}
                   </div>
                   {tone === 'other' && (
@@ -413,15 +409,14 @@ export default function GeneratePage() {
                   <div className="flex flex-wrap gap-2 mt-2">
                     {(Object.entries(VISUAL_STYLE_LABELS) as [VisualStyle, string][]).map(
                       ([key, label]) => (
-                        <Button
+                        <button
                           key={key}
                           type="button"
-                          variant={visualStyle === key ? 'default' : 'outline'}
-                          size="sm"
+                          className={`chip-toggle ${visualStyle === key ? 'active' : ''}`}
                           onClick={() => setVisualStyle(key)}
                         >
                           {label}
-                        </Button>
+                        </button>
                       )
                     )}
                   </div>
@@ -439,11 +434,10 @@ export default function GeneratePage() {
                   <div className="flex flex-wrap gap-2 mt-2">
                     {(Object.entries(IMAGE_ELEMENT_LABELS) as [ImageElement, string][]).map(
                       ([key, label]) => (
-                        <Button
+                        <button
                           key={key}
                           type="button"
-                          variant={imageElements.includes(key) ? 'default' : 'outline'}
-                          size="sm"
+                          className={`chip-toggle ${imageElements.includes(key) ? 'active' : ''}`}
                           onClick={() =>
                             setImageElements((prev) =>
                               prev.includes(key)
@@ -453,7 +447,7 @@ export default function GeneratePage() {
                           }
                         >
                           {label}
-                        </Button>
+                        </button>
                       )
                     )}
                   </div>
@@ -481,15 +475,14 @@ export default function GeneratePage() {
                   <div className="flex flex-wrap gap-2 mt-2">
                     {(Object.entries(SCENARIO_LABELS) as [ScenarioType, string][]).map(
                       ([key, label]) => (
-                        <Button
+                        <button
                           key={key}
                           type="button"
-                          variant={scenario === key ? 'default' : 'outline'}
-                          size="sm"
+                          className={`chip-toggle ${scenario === key ? 'active' : ''}`}
                           onClick={() => setScenario(key)}
                         >
                           {label}
-                        </Button>
+                        </button>
                       )
                     )}
                   </div>
@@ -506,15 +499,14 @@ export default function GeneratePage() {
                   <Label>Mood / Atmosfera</Label>
                   <div className="flex flex-wrap gap-2 mt-2">
                     {(Object.entries(MOOD_LABELS) as [MoodType, string][]).map(([key, label]) => (
-                      <Button
+                      <button
                         key={key}
                         type="button"
-                        variant={mood === key ? 'default' : 'outline'}
-                        size="sm"
+                        className={`chip-toggle ${mood === key ? 'active' : ''}`}
                         onClick={() => setMood(key)}
                       >
                         {label}
-                      </Button>
+                      </button>
                     ))}
                   </div>
                   {mood === 'other' && (
@@ -531,15 +523,14 @@ export default function GeneratePage() {
                   <div className="flex flex-wrap gap-2 mt-2">
                     {(Object.entries(LIGHTING_LABELS) as [LightingType, string][]).map(
                       ([key, label]) => (
-                        <Button
+                        <button
                           key={key}
                           type="button"
-                          variant={lighting === key ? 'default' : 'outline'}
-                          size="sm"
+                          className={`chip-toggle ${lighting === key ? 'active' : ''}`}
                           onClick={() => setLighting(key)}
                         >
                           {label}
-                        </Button>
+                        </button>
                       )
                     )}
                   </div>
@@ -549,15 +540,14 @@ export default function GeneratePage() {
                   <div className="flex flex-wrap gap-2 mt-2">
                     {(Object.entries(BACKGROUND_LABELS) as [BackgroundType, string][]).map(
                       ([key, label]) => (
-                        <Button
+                        <button
                           key={key}
                           type="button"
-                          variant={background === key ? 'default' : 'outline'}
-                          size="sm"
+                          className={`chip-toggle ${background === key ? 'active' : ''}`}
                           onClick={() => setBackground(key)}
                         >
                           {label}
-                        </Button>
+                        </button>
                       )
                     )}
                   </div>
@@ -697,7 +687,7 @@ export default function GeneratePage() {
             <Button
               type="submit"
               size="lg"
-              className="w-full gap-2"
+              className="w-full gap-2 gradient-primary border-0 text-white h-12 text-base"
               disabled={generating || !context.trim()}
             >
               <Wand2 className="h-5 w-5" />

@@ -11,6 +11,20 @@ interface RouteHandler {
   (body: Record<string, unknown>): Promise<{ status: number; data: unknown }>
 }
 
+// Gemini API response shape (partial)
+interface GeminiPart {
+  text?: string
+  inlineData?: { mimeType: string; data: string }
+}
+interface GeminiResponse {
+  candidates?: { content?: { parts?: GeminiPart[] } }[]
+}
+
+// OpenAI API response shape (partial)
+interface OpenAIResponse {
+  choices?: { message?: { content?: string } }[]
+}
+
 // ==================== ROUTE HANDLERS ====================
 
 const routes: Record<string, RouteHandler> = {
@@ -52,9 +66,9 @@ async function handleGenerate(body: Record<string, unknown>) {
     return { status: response.status, data: { error: text } }
   }
 
-  const result = await response.json()
+  const result = await response.json() as GeminiResponse
   const imagePart = result?.candidates?.[0]?.content?.parts?.find(
-    (p: { inlineData?: unknown }) => p.inlineData
+    (p: GeminiPart) => p.inlineData
   )
 
   if (!imagePart?.inlineData) {
@@ -99,7 +113,7 @@ async function handleCaptions(body: Record<string, unknown>) {
     return { status: response.status, data: { error: text } }
   }
 
-  const data = await response.json()
+  const data = await response.json() as OpenAIResponse
   const content = data.choices?.[0]?.message?.content
   if (!content) return { status: 500, data: { error: 'Empty caption response' } }
 
@@ -143,9 +157,9 @@ async function handleRefine(body: Record<string, unknown>) {
     return { status: response.status, data: { error: text } }
   }
 
-  const result = await response.json()
+  const result = await response.json() as GeminiResponse
   const imagePart = result?.candidates?.[0]?.content?.parts?.find(
-    (p: { inlineData?: unknown }) => p.inlineData
+    (p: GeminiPart) => p.inlineData
   )
 
   if (!imagePart?.inlineData) {
@@ -187,7 +201,7 @@ async function handleIdea(body: Record<string, unknown>) {
     return { status: response.status, data: { error: text } }
   }
 
-  const data = await response.json()
+  const data = await response.json() as OpenAIResponse
   const content = data.choices?.[0]?.message?.content
   if (!content) return { status: 500, data: { error: 'Empty idea response' } }
 
@@ -231,9 +245,9 @@ async function handleUpscale(body: Record<string, unknown>) {
     return { status: response.status, data: { error: text } }
   }
 
-  const result = await response.json()
+  const result = await response.json() as GeminiResponse
   const imagePart = result?.candidates?.[0]?.content?.parts?.find(
-    (p: { inlineData?: unknown }) => p.inlineData
+    (p: GeminiPart) => p.inlineData
   )
 
   if (!imagePart?.inlineData) {
@@ -282,9 +296,9 @@ async function handleRemoveBackground(body: Record<string, unknown>) {
     return { status: response.status, data: { error: text } }
   }
 
-  const result = await response.json()
+  const result = await response.json() as GeminiResponse
   const imagePart = result?.candidates?.[0]?.content?.parts?.find(
-    (p: { inlineData?: unknown }) => p.inlineData
+    (p: GeminiPart) => p.inlineData
   )
 
   if (!imagePart?.inlineData) {
@@ -337,9 +351,9 @@ async function handleVariations(body: Record<string, unknown>) {
       })
 
       if (response.ok) {
-        const result = await response.json()
+        const result = await response.json() as GeminiResponse
         const imagePart = result?.candidates?.[0]?.content?.parts?.find(
-          (p: { inlineData?: unknown }) => p.inlineData
+          (p: GeminiPart) => p.inlineData
         )
         if (imagePart?.inlineData) {
           variations.push({

@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { ImageModal } from '@/components/shared/image-modal'
 import { CaptionCard } from '@/components/shared/caption-card'
+import { formatDateBR } from '@/lib/constants'
 import {
   PLATFORM_CONFIG,
   IMAGE_FORMAT_CONFIG,
@@ -48,9 +49,9 @@ export default function HistoryPage() {
   )
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 lg:p-8 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Histórico</h1>
+        <h1 className="page-header">Histórico</h1>
         <p className="text-muted-foreground">
           Todas as suas gerações anteriores
         </p>
@@ -62,7 +63,7 @@ export default function HistoryPage() {
           placeholder="Buscar por contexto, plataforma..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="pl-10"
+          className="pl-10 h-11"
         />
       </div>
 
@@ -88,13 +89,12 @@ export default function HistoryPage() {
             const isExpanded = expandedId === g.id
             const platformInfo = PLATFORM_CONFIG[g.platform]
             const formatInfo = IMAGE_FORMAT_CONFIG[g.imageFormat]
-            const createdAt =
-              g.createdAt instanceof Date
-                ? g.createdAt
-                : new Date((g.createdAt as unknown as { seconds: number }).seconds * 1000)
+            const createdAt = g.createdAt instanceof Date
+              ? g.createdAt
+              : new Date((g.createdAt as unknown as { seconds: number }).seconds * 1000)
 
             return (
-              <Card key={g.id} className="overflow-hidden">
+              <Card key={g.id} className="overflow-hidden hover-lift">
                 <CardHeader
                   className="cursor-pointer"
                   onClick={() =>
@@ -137,7 +137,7 @@ export default function HistoryPage() {
                         )}
                         <span className="flex items-center gap-1">
                           <Calendar className="h-3.5 w-3.5" />
-                          {createdAt.toLocaleDateString('pt-BR')}
+                          {formatDateBR(createdAt)}
                         </span>
                       </div>
                       {isExpanded ? (
@@ -190,7 +190,7 @@ export default function HistoryPage() {
                           {g.generatedImageUrls.map((url, i) => (
                             <div
                               key={i}
-                              className="aspect-square relative rounded-lg overflow-hidden bg-muted cursor-pointer hover:ring-2 hover:ring-primary transition-all"
+                              className="aspect-square relative rounded-lg overflow-hidden bg-muted cursor-pointer hover:ring-2 hover:ring-primary transition-all group"
                               onClick={() =>
                                 setSelectedImage({
                                   url,
@@ -203,7 +203,7 @@ export default function HistoryPage() {
                               <img
                                 src={url}
                                 alt={`Image ${i + 1}`}
-                                className="object-cover w-full h-full"
+                                className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
                               />
                             </div>
                           ))}

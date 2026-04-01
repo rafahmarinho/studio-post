@@ -192,15 +192,15 @@ export default function BrandKitsPage() {
   }
 
   return (
-    <div className="p-6 max-w-6xl mx-auto space-y-6">
+    <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Brand Kits</h1>
+          <h1 className="page-header">Brand Kits</h1>
           <p className="text-muted-foreground">
             Gerencie identidades visuais para uso rápido na geração de criativos
           </p>
         </div>
-        <Button onClick={openCreate}>
+        <Button onClick={openCreate} className="gradient-primary border-0 text-white">
           <Plus className="h-4 w-4 mr-2" />
           Novo Brand Kit
         </Button>
@@ -223,7 +223,7 @@ export default function BrandKitsPage() {
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {kits.map((kit) => (
-            <Card key={kit.id} className="group">
+            <Card key={kit.id} className="group hover-lift">
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                   <div>

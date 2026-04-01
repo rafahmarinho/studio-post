@@ -198,10 +198,10 @@ export default function TemplatesPage() {
   }
 
   return (
-    <div className="p-6 max-w-6xl mx-auto space-y-6">
+    <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Templates</h1>
+          <h1 className="page-header">Templates</h1>
           <p className="text-muted-foreground">
             Templates pré-configurados para gerar criativos rapidamente
           </p>
@@ -221,7 +221,7 @@ export default function TemplatesPage() {
               ))}
             </SelectContent>
           </Select>
-          <Button onClick={openCreate}>
+          <Button onClick={openCreate} className="gradient-primary border-0 text-white">
             <Plus className="h-4 w-4 mr-2" />
             Novo Template
           </Button>
@@ -247,7 +247,7 @@ export default function TemplatesPage() {
           {templates.map((tpl) => {
             const isOwner = tpl.userId === user?.uid
             return (
-              <Card key={tpl.id} className="group">
+              <Card key={tpl.id} className="group hover-lift">
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
                     <div>

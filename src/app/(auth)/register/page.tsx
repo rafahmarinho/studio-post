@@ -7,8 +7,7 @@ import { useAuth } from '@/lib/auth-context'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Sparkles } from 'lucide-react'
+import { Sparkles, CheckCircle2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 export default function RegisterPage() {
@@ -49,17 +48,53 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <Sparkles className="h-6 w-6 text-primary" />
+    <div className="flex min-h-screen">
+      {/* Left branding panel */}
+      <div className="hidden lg:flex lg:w-1/2 gradient-primary relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,.08),transparent)]" />
+        <div className="relative flex flex-col justify-between p-12 text-white">
+          <Link href="/" className="flex items-center gap-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/15">
+              <Sparkles className="h-5 w-5" />
+            </div>
             <span className="text-xl font-bold">Studio Post</span>
+          </Link>
+          <div>
+            <h2 className="text-3xl font-bold mb-4 leading-tight">Comece a criar<br />em minutos</h2>
+            <p className="text-white/70 text-lg mb-10">Conta gratuita. 5 criativos por dia. Sem cartão.</p>
+            <div className="space-y-3">
+              {[
+                'Geração de imagens com Google Gemini',
+                'Legendas otimizadas com ChatGPT',
+                'Refinamento visual por texto',
+                'Histórico completo + brand kits',
+                'Open Source — MIT License',
+              ].map((item) => (
+                <div key={item} className="flex items-center gap-2.5 text-sm text-white/80">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-300 shrink-0" />
+                  {item}
+                </div>
+              ))}
+            </div>
           </div>
-          <CardTitle>Criar sua conta</CardTitle>
-          <CardDescription>Comece a gerar criativos profissionais com IA</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
+          <p className="text-white/40 text-sm">Powered by Gemini + ChatGPT</p>
+        </div>
+      </div>
+
+      {/* Right form panel */}
+      <div className="flex-1 flex items-center justify-center px-6 py-12 bg-background">
+        <div className="w-full max-w-sm space-y-8">
+          <div className="lg:hidden flex items-center justify-center gap-2 mb-4">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg gradient-primary text-white">
+              <Sparkles className="h-4 w-4" />
+            </div>
+            <span className="text-lg font-bold">Studio Post</span>
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">Criar sua conta</h1>
+            <p className="text-muted-foreground text-sm mt-1">Comece a gerar criativos profissionais com IA</p>
+          </div>
+          <div className="space-y-4">
           <Button
             variant="outline"
             className="w-full"
@@ -99,51 +134,30 @@ export default function RegisterPage() {
           <form onSubmit={handleRegister} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">Nome</Label>
-              <Input
-                id="name"
-                type="text"
-                placeholder="Seu nome"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
+              <Input id="name" type="text" placeholder="Seu nome" value={name} onChange={(e) => setName(e.target.value)} required className="h-11" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">E-mail</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="seu@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+              <Input id="email" type="email" placeholder="seu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} required className="h-11" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Senha</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Mínimo 6 caracteres"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={6}
-              />
+              <Input id="password" type="password" placeholder="Mínimo 6 caracteres" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} className="h-11" />
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Criando conta...' : 'Criar conta'}
+            <Button type="submit" className="w-full h-11 gradient-primary border-0 text-white" disabled={loading}>
+              {loading ? 'Criando conta...' : 'Criar conta grátis'}
             </Button>
           </form>
 
           <p className="text-center text-sm text-muted-foreground">
             Já tem conta?{' '}
-            <Link href="/login" className="text-primary hover:underline">
+            <Link href="/login" className="text-primary font-medium hover:underline">
               Entrar
             </Link>
           </p>
-        </CardContent>
-      </Card>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

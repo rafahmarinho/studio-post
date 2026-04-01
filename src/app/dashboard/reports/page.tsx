@@ -74,10 +74,10 @@ export default function ReportsPage() {
   }
 
   return (
-    <div className="p-6 max-w-6xl mx-auto space-y-6">
+    <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Relatórios</h1>
+          <h1 className="page-header">Relatórios</h1>
           <p className="text-muted-foreground">
             Acompanhe o desempenho e custos das suas gerações
           </p>
@@ -106,51 +106,45 @@ export default function ReportsPage() {
         <>
           {/* Summary Cards */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium">Gerações</CardTitle>
-                <TrendingUp className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{report.summary.totalGenerations}</div>
-                <p className="text-xs text-muted-foreground">
-                  nos últimos {report.days} dias
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium">Imagens</CardTitle>
-                <ImageIcon className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{report.summary.totalImages}</div>
-                <p className="text-xs text-muted-foreground">
-                  Média: {report.summary.avgImagesPerGeneration}/geração
-                </p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium">Legendas</CardTitle>
-                <Type className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{report.summary.totalCaptions}</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium">Custo Total</CardTitle>
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{report.summary.totalCostFormatted}</div>
-                <p className="text-xs text-muted-foreground">
-                  Média: R$ {(report.summary.avgCostPerGenerationCents / 100).toFixed(2)}/geração
-                </p>
-              </CardContent>
-            </Card>
+            <div className="stat-card">
+              <div className="flex items-center justify-between">
+                <span className="section-label">Gerações</span>
+                <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <TrendingUp className="h-4 w-4 text-primary" />
+                </div>
+              </div>
+              <p className="text-3xl font-bold mt-2">{report.summary.totalGenerations}</p>
+              <p className="text-xs text-muted-foreground mt-1">nos últimos {report.days} dias</p>
+            </div>
+            <div className="stat-card">
+              <div className="flex items-center justify-between">
+                <span className="section-label">Imagens</span>
+                <div className="h-9 w-9 rounded-lg bg-orange-500/10 flex items-center justify-center">
+                  <ImageIcon className="h-4 w-4 text-orange-500" />
+                </div>
+              </div>
+              <p className="text-3xl font-bold mt-2">{report.summary.totalImages}</p>
+              <p className="text-xs text-muted-foreground mt-1">Média: {report.summary.avgImagesPerGeneration}/geração</p>
+            </div>
+            <div className="stat-card">
+              <div className="flex items-center justify-between">
+                <span className="section-label">Legendas</span>
+                <div className="h-9 w-9 rounded-lg bg-violet-500/10 flex items-center justify-center">
+                  <Type className="h-4 w-4 text-violet-500" />
+                </div>
+              </div>
+              <p className="text-3xl font-bold mt-2">{report.summary.totalCaptions}</p>
+            </div>
+            <div className="stat-card">
+              <div className="flex items-center justify-between">
+                <span className="section-label">Custo Total</span>
+                <div className="h-9 w-9 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                  <DollarSign className="h-4 w-4 text-emerald-500" />
+                </div>
+              </div>
+              <p className="text-3xl font-bold mt-2">{report.summary.totalCostFormatted}</p>
+              <p className="text-xs text-muted-foreground mt-1">Média: R$ {(report.summary.avgCostPerGenerationCents / 100).toFixed(2)}/geração</p>
+            </div>
           </div>
 
           <div className="grid gap-6 md:grid-cols-2">
