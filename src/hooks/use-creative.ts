@@ -332,8 +332,8 @@ export function useCreative() {
           status: finalStatus as 'completed' | 'failed',
         })
 
-        // Record cost (skip for own_keys and free tier)
-        if (userDoc.tier === 'paid') {
+        // Record cost (skip for own_keys tier — they use their own API keys)
+        if (userDoc.tier !== 'own_keys') {
           await recordCost({
             userId: user.uid,
             userName: user.displayName || user.email || '',

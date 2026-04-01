@@ -332,14 +332,11 @@ export interface UserDoc {
   displayName: string
   photoURL?: string
   role: 'admin' | 'user'
-  tier: 'free' | 'own_keys' | 'paid'
+  tier: 'own_keys' | 'paid'
   apiKeys?: {
     geminiKey?: string
     openaiKey?: string
   }
-  dailyGenerations: number
-  dailyRefinements: number
-  lastGenerationDate: string
   createdAt: Date
   updatedAt: Date
 }
@@ -572,7 +569,7 @@ export const TENANT_PLAN_LIMITS: Record<TenantPlan, { members: number; dailyImag
 
 export interface TenantSettings {
   allowMemberOwnKeys: boolean
-  defaultTier: 'free' | 'paid'
+  defaultTier: 'own_keys' | 'paid'
   dailyLimitCents: number
   watermark?: string
   customDomain?: string

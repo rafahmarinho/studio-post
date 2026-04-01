@@ -61,7 +61,7 @@ export default function RegisterPage() {
           </Link>
           <div>
             <h2 className="text-3xl font-bold mb-4 leading-tight">Comece a criar<br />em minutos</h2>
-            <p className="text-white/70 text-lg mb-10">Conta gratuita. 5 criativos por dia. Sem cartão.</p>
+            <p className="text-white/70 text-lg mb-10">Crie criativos em escala com IA. Comece agora.</p>
             <div className="space-y-3">
               {[
                 'Geração de imagens com Google Gemini',

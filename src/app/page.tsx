@@ -19,7 +19,6 @@ import {
   Globe,
   Wand2,
   CheckCircle2,
-  Users,
   Monitor,
 } from 'lucide-react'
 
@@ -205,11 +204,11 @@ export default function LandingPage() {
               <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mt-12 text-sm text-muted-foreground animate-fade-in-up stagger-4">
                 <span className="flex items-center gap-1.5">
                   <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                  5 imagens/dia grátis
+                  Use suas próprias chaves
                 </span>
                 <span className="flex items-center gap-1.5">
                   <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                  Sem cartão de crédito
+                  Ou pague por criativo
                 </span>
                 <span className="flex items-center gap-1.5">
                   <CheckCircle2 className="h-4 w-4 text-emerald-500" />
@@ -299,17 +298,17 @@ export default function LandingPage() {
             <div ref={pricingHeadRef} className="text-center mb-16 scroll-hidden">
               <p className="section-label mb-3">Planos</p>
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
-                Comece de graça, escale como quiser
+                Dois modos. Você escolhe.
               </h2>
               <p className="text-muted-foreground max-w-lg mx-auto">
-                Use suas próprias API keys sem custo adicional. Ou deixe por nossa conta.
+                Use suas próprias API keys sem custo adicional, ou pague apenas pelo que usar.
               </p>
             </div>
 
-            <div ref={pricingGridRef} className="grid gap-6 md:grid-cols-3 max-w-4xl mx-auto">
-              {/* BYO */}
-              <div data-scroll="up" className="rounded-2xl border bg-card p-7 hover-lift scroll-delay-1">
-                <div className="flex items-center gap-3 mb-4">
+            <div ref={pricingGridRef} className="grid gap-8 md:grid-cols-2 max-w-3xl mx-auto">
+              {/* BYO Keys */}
+              <div data-scroll="up" className="rounded-2xl border bg-card p-8 hover-lift scroll-delay-1">
+                <div className="flex items-center gap-3 mb-5">
                   <div className="h-10 w-10 rounded-xl bg-blue-500/10 flex items-center justify-center">
                     <Globe className="h-5 w-5 text-blue-500" />
                   </div>
@@ -319,9 +318,9 @@ export default function LandingPage() {
                   </div>
                 </div>
                 <div className="text-3xl font-bold mb-1">Grátis</div>
-                <p className="text-sm text-muted-foreground mb-6">Para sempre.</p>
-                <ul className="space-y-2.5 text-sm mb-6">
-                  {['Sem limites diários', 'Suas API keys Gemini + OpenAI', 'Custo direto do provedor', 'Todas as funcionalidades'].map((f) => (
+                <p className="text-sm text-muted-foreground mb-6">Para sempre. Sem limites.</p>
+                <ul className="space-y-2.5 text-sm mb-8">
+                  {['Geração ilimitada de imagens', 'Legendas ilimitadas com GPT', 'Suas API keys Gemini + OpenAI', 'Custo direto do provedor', 'Todas as funcionalidades'].map((f) => (
                     <li key={f} className="flex items-start gap-2">
                       <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
                       {f}
@@ -329,48 +328,22 @@ export default function LandingPage() {
                   ))}
                 </ul>
                 <Link href={user ? '/dashboard/settings' : '/register'} className="block">
-                  <Button variant="outline" className="w-full">Configurar keys</Button>
+                  <Button variant="outline" className="w-full h-11">Configurar keys</Button>
                 </Link>
               </div>
 
-              {/* Free */}
-              <div data-scroll="up" className="rounded-2xl border-2 border-primary/30 bg-card p-7 relative hover-lift glow-primary scroll-delay-2">
+              {/* Pay-as-you-go */}
+              <div data-scroll="up" className="rounded-2xl border-2 border-primary/30 bg-card p-8 relative hover-lift glow-primary scroll-delay-2">
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <span className="gradient-primary text-white text-xs font-semibold px-3 py-1 rounded-full">Popular</span>
+                  <span className="gradient-primary text-white text-xs font-semibold px-3 py-1 rounded-full">Recomendado</span>
                 </div>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <Users className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold">Free</h3>
-                    <p className="text-xs text-muted-foreground">Para experimentar</p>
-                  </div>
-                </div>
-                <div className="text-3xl font-bold mb-1">R$ 0</div>
-                <p className="text-sm text-muted-foreground mb-6">Sem cartão de crédito.</p>
-                <ul className="space-y-2.5 text-sm mb-6">
-                  {['5 imagens por dia', '2 refinamentos por dia', 'Legendas incluídas', 'Histórico completo'].map((f) => (
-                    <li key={f} className="flex items-start gap-2">
-                      <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link href={user ? '/dashboard/generate' : '/register'} className="block">
-                  <Button className="w-full gradient-primary border-0 text-white">Começar grátis</Button>
-                </Link>
-              </div>
-
-              {/* Paid */}
-              <div data-scroll="up" className="rounded-2xl border bg-card p-7 hover-lift scroll-delay-3">
-                <div className="flex items-center gap-3 mb-4">
+                <div className="flex items-center gap-3 mb-5">
                   <div className="h-10 w-10 rounded-xl bg-orange-500/10 flex items-center justify-center">
                     <Monitor className="h-5 w-5 text-orange-500" />
                   </div>
                   <div>
                     <h3 className="font-semibold">Pay-as-you-go</h3>
-                    <p className="text-xs text-muted-foreground">Para produção</p>
+                    <p className="text-xs text-muted-foreground">Nós cuidamos da infra</p>
                   </div>
                 </div>
                 <div className="flex items-baseline gap-1.5 mb-1">
@@ -378,8 +351,8 @@ export default function LandingPage() {
                   <span className="text-sm text-muted-foreground">/criativo</span>
                 </div>
                 <p className="text-sm text-muted-foreground mb-6">Img + legenda. Desconto por volume.</p>
-                <ul className="space-y-2.5 text-sm mb-6">
-                  {['Até 30% de desconto por lote', 'Sem limites (R$ 300/dia)', 'Refinamento: R$ 0,99', 'Dashboard de custos'].map((f) => (
+                <ul className="space-y-2.5 text-sm mb-8">
+                  {['Até 30% de desconto por lote', 'Limite diário de R$ 300', 'Refinamento: R$ 0,99/imagem', 'Dashboard completo de custos', 'Sem configuração de keys'].map((f) => (
                     <li key={f} className="flex items-start gap-2">
                       <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
                       {f}
@@ -387,7 +360,7 @@ export default function LandingPage() {
                   ))}
                 </ul>
                 <Link href={user ? '/dashboard/generate' : '/register'} className="block">
-                  <Button variant="outline" className="w-full">Criar conta</Button>
+                  <Button className="w-full h-11 gradient-primary border-0 text-white">Começar agora</Button>
                 </Link>
               </div>
             </div>

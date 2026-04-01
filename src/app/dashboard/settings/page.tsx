@@ -27,7 +27,7 @@ export default function SettingsPage() {
       await updateDoc(doc(db, 'users', user.uid), {
         'apiKeys.geminiKey': geminiKey || null,
         'apiKeys.openaiKey': openaiKey || null,
-        tier: geminiKey || openaiKey ? 'own_keys' : userDoc?.tier === 'own_keys' ? 'free' : userDoc?.tier,
+        tier: geminiKey || openaiKey ? 'own_keys' : userDoc?.tier === 'own_keys' ? 'paid' : userDoc?.tier,
         updatedAt: new Date(),
       })
       toast.success('Chaves de API salvas!')
@@ -108,17 +108,13 @@ export default function SettingsPage() {
             <Badge variant="secondary" className="text-sm">
               {userDoc?.tier === 'own_keys'
                 ? 'BYO Keys'
-                : userDoc?.tier === 'paid'
-                  ? 'Pago'
-                  : 'Gratuito'}
+                : 'Pay-as-you-go'}
             </Badge>
           </div>
           <p className="text-sm text-muted-foreground">
             {userDoc?.tier === 'own_keys'
               ? 'Sem limites — você usa suas próprias chaves de API.'
-              : userDoc?.tier === 'paid'
-                ? 'Pay-as-you-go com R$ 300,00 de limite diário.'
-                : '5 imagens gratuitas por dia.'}
+              : 'Pay-as-you-go com R$ 300,00 de limite diário.'}
           </p>
           <p className="text-xs text-muted-foreground">
             Para mudar para o modo BYO Keys, basta adicionar suas chaves de API abaixo.

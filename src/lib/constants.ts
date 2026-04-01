@@ -4,8 +4,6 @@ import { GenerationMode } from '@/types'
 
 export const DAILY_LIMIT_CENTS = 30000 // R$ 300,00
 export const REFINE_COST_CENTS = 99 // R$ 0,99
-export const FREE_DAILY_IMAGE_LIMIT = 5
-export const FREE_DAILY_REFINE_LIMIT = 2
 
 export const BASE_PRICE: Record<GenerationMode, number> = {
   images_only: 300, // R$ 3,00

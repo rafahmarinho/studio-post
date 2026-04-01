@@ -52,10 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       displayName: firebaseUser.displayName || '',
       photoURL: firebaseUser.photoURL || undefined,
       role: 'user',
-      tier: 'free',
-      dailyGenerations: 0,
-      dailyRefinements: 0,
-      lastGenerationDate: '',
+      tier: 'paid',
       createdAt: new Date(),
       updatedAt: new Date(),
     }
