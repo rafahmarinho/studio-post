@@ -120,12 +120,12 @@ export default function CollaborationPage() {
     setLoading(true)
     try {
       await Promise.all([
-        loadShares(user.uid),
-        loadApprovals(user.uid),
-        loadHistory(user.uid),
+        loadShares(user.uid).catch(() => {}),
+        loadApprovals(user.uid).catch(() => {}),
+        loadHistory(user.uid).catch(() => {}),
       ])
     } catch {
-      toast.error('Erro ao carregar dados')
+      // Silently fail on initial load — empty state will be shown
     } finally {
       setLoading(false)
     }

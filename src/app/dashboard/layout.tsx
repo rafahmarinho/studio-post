@@ -26,19 +26,44 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 
-const NAV_ITEMS = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/dashboard/generate', label: 'Gerar Criativos', icon: Wand2 },
-  { href: '/dashboard/history', label: 'Histórico', icon: History },
-  { href: '/dashboard/brand-kits', label: 'Brand Kits', icon: Palette },
-  { href: '/dashboard/templates', label: 'Templates', icon: LayoutTemplate },
-  { href: '/dashboard/integrations', label: 'Integrações', icon: Plug },
-  { href: '/dashboard/schedule', label: 'Agendamento', icon: CalendarClock },
-  { href: '/dashboard/collaboration', label: 'Colaboração', icon: Users },
-  { href: '/dashboard/reports', label: 'Relatórios', icon: BarChart3 },
-  { href: '/dashboard/costs', label: 'Custos', icon: DollarSign },
-  { href: '/dashboard/workspace', label: 'Workspace', icon: Building2 },
-  { href: '/dashboard/settings', label: 'Configurações', icon: Settings },
+const NAV_SECTIONS = [
+  {
+    label: 'Principal',
+    items: [
+      { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+      { href: '/dashboard/generate', label: 'Gerar Criativos', icon: Wand2 },
+      { href: '/dashboard/history', label: 'Histórico', icon: History },
+    ],
+  },
+  {
+    label: 'Marca',
+    items: [
+      { href: '/dashboard/brand-kits', label: 'Brand Kits', icon: Palette },
+      { href: '/dashboard/templates', label: 'Templates', icon: LayoutTemplate },
+    ],
+  },
+  {
+    label: 'Publicação',
+    items: [
+      { href: '/dashboard/integrations', label: 'Integrações', icon: Plug },
+      { href: '/dashboard/schedule', label: 'Agendamento', icon: CalendarClock },
+    ],
+  },
+  {
+    label: 'Equipe',
+    items: [
+      { href: '/dashboard/collaboration', label: 'Colaboração', icon: Users },
+      { href: '/dashboard/workspace', label: 'Workspace', icon: Building2 },
+    ],
+  },
+  {
+    label: 'Administração',
+    items: [
+      { href: '/dashboard/reports', label: 'Relatórios', icon: BarChart3 },
+      { href: '/dashboard/costs', label: 'Custos', icon: DollarSign },
+      { href: '/dashboard/settings', label: 'Configurações', icon: Settings },
+    ],
+  },
 ]
 
 const COLLAPSE_DELAY = 3000
@@ -176,37 +201,59 @@ export default function DashboardLayout({
         )}
 
         {/* Navigation */}
-        <nav className={`flex-1 py-3 space-y-0.5 overflow-y-auto overflow-x-hidden ${isExpanded ? 'px-2.5' : 'px-1.5'}`}>
-          {NAV_ITEMS.map((item) => {
-            const isActive = pathname === item.href
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setMobileOpen(false)}
-                title={!isExpanded ? item.label : undefined}
-                className={`
-                  flex items-center gap-3 rounded-lg text-sm font-medium
-                  transition-all duration-200
-                  ${isExpanded ? 'px-3 py-2.5' : 'px-0 py-2.5 justify-center'}
-                  ${
-                    isActive
-                      ? 'bg-sidebar-accent text-sidebar-accent-foreground font-semibold'
-                      : 'text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/40'
-                  }
-                `}
+        <nav className={`flex-1 py-2 overflow-y-auto overflow-x-hidden ${isExpanded ? 'px-2.5' : 'px-1.5'}`}>
+          {NAV_SECTIONS.map((section, sIdx) => (
+            <div key={section.label} className={sIdx > 0 ? 'mt-4' : ''}>
+              {/* Section label — visible only when expanded */}
+              <div
+                className={`transition-all duration-300 overflow-hidden ${
+                  isExpanded
+                    ? 'opacity-100 h-6 px-3 mb-1'
+                    : 'opacity-0 h-0 px-0 mb-0'
+                }`}
               >
-                <item.icon className={`h-4.5 w-4.5 shrink-0 ${isActive ? 'text-primary' : ''}`} />
-                <span
-                  className={`whitespace-nowrap transition-all duration-300 ${
-                    isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0 overflow-hidden'
-                  }`}
-                >
-                  {item.label}
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-sidebar-foreground/40">
+                  {section.label}
                 </span>
-              </Link>
-            )
-          })}
+              </div>
+              {/* Divider when collapsed — thin line separator */}
+              {!isExpanded && sIdx > 0 && (
+                <div className="mx-2 mb-2 border-t border-sidebar-border" />
+              )}
+              <div className="space-y-0.5">
+                {section.items.map((item) => {
+                  const isActive = pathname === item.href
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setMobileOpen(false)}
+                      title={!isExpanded ? item.label : undefined}
+                      className={`
+                        flex items-center gap-3 rounded-lg text-sm font-medium
+                        transition-all duration-200
+                        ${isExpanded ? 'px-3 py-2' : 'px-0 py-2 justify-center'}
+                        ${
+                          isActive
+                            ? 'bg-sidebar-accent text-sidebar-accent-foreground font-semibold'
+                            : 'text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/40'
+                        }
+                      `}
+                    >
+                      <item.icon className={`h-4.5 w-4.5 shrink-0 ${isActive ? 'text-primary' : ''}`} />
+                      <span
+                        className={`whitespace-nowrap transition-all duration-300 ${
+                          isExpanded ? 'opacity-100 w-auto' : 'opacity-0 w-0 overflow-hidden'
+                        }`}
+                      >
+                        {item.label}
+                      </span>
+                    </Link>
+                  )
+                })}
+              </div>
+            </div>
+          ))}
         </nav>
 
         {/* User section */}

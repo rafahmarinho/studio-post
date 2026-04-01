@@ -30,6 +30,7 @@ Generate professional images and captions at scale using Google Gemini and OpenA
   - [Installation](#installation)
   - [Environment Variables](#environment-variables)
   - [Firebase Setup](#firebase-setup)
+  - [Meta (Facebook/Instagram) Setup](#meta-facebookinstagram-setup)
   - [Running Locally](#running-locally)
 - [Project Structure](#-project-structure)
 - [Features in Detail](#-features-in-detail)
@@ -237,6 +238,21 @@ OPEN_API_KEY=sk-...
 # STRIPE_WEBHOOK_SECRET=whsec_...
 # NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...
 
+# ──────────────────────────────────────────────
+# Optional: Meta (Facebook/Instagram) — for direct publishing
+# See "Meta Setup" section below for step-by-step instructions
+# ──────────────────────────────────────────────
+# NEXT_PUBLIC_META_APP_ID=123456789012345
+# META_APP_ID=123456789012345
+# META_APP_SECRET=abc123def456...
+
+# ──────────────────────────────────────────────
+# Optional: Encryption key for storing user tokens securely
+# Must be exactly 32 characters
+# Generate: node -e "console.log(require('crypto').randomBytes(16).toString('hex'))"
+# ──────────────────────────────────────────────
+# ENCRYPTION_KEY=a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6
+
 ```
 
 ### Firebase Setup
@@ -360,6 +376,151 @@ Create these composite indexes in Firebase Console → Firestore → Indexes:
 | `creative_templates` | `isPublic` ASC, `createdAt` DESC | Composite |
 
 > Firebase will also automatically prompt you to create indexes when queries require them during development.
+
+### Meta (Facebook/Instagram) Setup
+
+This section is **optional** — only needed if you want to enable direct publishing to Instagram and Facebook from within the app.
+
+#### 1. Create a Meta Developer Account
+
+1. Go to [Meta for Developers](https://developers.facebook.com/)
+2. Click **Get Started** and log in with your Facebook account
+3. Complete the developer registration (verify email, accept terms)
+
+#### 2. Create a Meta App
+
+1. Go to [My Apps](https://developers.facebook.com/apps/) → **Create App**
+2. Select **Business** as the app type → **Next**
+3. Fill in:
+   - **App name**: `Studio Post` (or your app name)
+   - **App contact email**: your email
+   - **Business Account**: select or create one
+4. Click **Create App**
+5. Note your **App ID** — this is your `META_APP_ID`
+
+#### 3. Configure App Products
+
+In your app dashboard, add these products:
+
+1. **Facebook Login for Business**
+   - Click **Set Up** → **Web**
+   - **Site URL**: `https://your-app.vercel.app` (or `http://localhost:3000` for development)
+   - Go to **Settings** under Facebook Login:
+     - **Valid OAuth Redirect URIs**: add `https://your-app.vercel.app/api/integrations/meta/callback`
+     - For development, also add: `http://localhost:3000/api/integrations/meta/callback`
+     - **Save Changes**
+
+2. **Instagram Graph API**
+   - Click **Set Up** to enable it (no extra configuration needed)
+
+#### 4. Request Permissions
+
+Go to **App Review** → **Permissions and Features** and request:
+
+| Permission | Purpose | Required |
+|---|---|---|
+| `pages_manage_posts` | Publish posts to Facebook Pages | ✅ |
+| `pages_read_engagement` | Read page insights and engagement | ✅ |
+| `instagram_basic` | Read Instagram account info | ✅ |
+| `instagram_content_publish` | Publish posts to Instagram | ✅ |
+
+> **Note:** For development/testing, these permissions work immediately for app admins and testers. For production (any Facebook user), you need to submit for **App Review** through the Meta Developer dashboard.
+
+#### 5. Add Test Users (Development)
+
+1. Go to **App Roles** → **Roles**
+2. **Add Testers** — these users can use the app without App Review approval
+3. Each tester must accept the invitation from their Facebook **Settings → Apps and Websites → Developer Apps**
+
+#### 6. Get the App Secret
+
+1. Go to **Settings** → **Basic**
+2. Click **Show** next to **App Secret**
+3. Copy the value — this is your `META_APP_SECRET`
+
+> ⚠️ **Never expose the App Secret in client-side code or commit it to git.**
+
+#### 7. Instagram Business Account Requirement
+
+To publish to Instagram, the user's Instagram account must be:
+
+1. An **Instagram Business** or **Creator** account (not Personal)
+2. **Connected to a Facebook Page** — done in Instagram app **Settings → Account → Linked Accounts → Facebook**
+
+This is a Meta platform requirement, not a Studio Post limitation.
+
+#### 8. Configure Environment Variables
+
+Add these to your `.env.local`:
+
+```env
+# Client-side (for OAuth redirect button)
+NEXT_PUBLIC_META_APP_ID=123456789012345
+
+# Server-side (for token exchange — NEVER expose these)
+META_APP_ID=123456789012345
+META_APP_SECRET=abc123def456ghi789jkl012mno345
+
+# Encryption key for storing user access tokens (exactly 32 characters)
+# Generate: node -e "console.log(require('crypto').randomBytes(16).toString('hex'))"
+ENCRYPTION_KEY=a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6
+```
+
+#### 9. How the OAuth Flow Works
+
+```
+User clicks "Connect Meta"
+        │
+        ▼
+Opens popup → facebook.com/dialog/oauth
+        │ (user authorizes app)
+        ▼
+Facebook redirects to /api/integrations/meta/callback
+        │ (exchanges code for short-lived token)
+        ▼
+Callback page sends token via postMessage to parent window
+        │
+        ▼
+Parent calls POST /api/integrations/meta
+  { action: 'exchange_token', shortLivedToken }
+        │ (exchanges for a 60-day long-lived token)
+        ▼
+Token encrypted (AES-256-CBC) and saved in Firestore
+        │
+        ▼
+Account appears in "Connections" tab ✅
+```
+
+**Token lifecycle:**
+- Short-lived token: ~1 hour (used only during OAuth, never stored)
+- Long-lived token: 60 days (encrypted in Firestore, auto-refresh available)
+- Users can refresh tokens from the integrations page before expiry
+
+#### 10. Publishing Flow
+
+Once connected, users can publish from the **Integrations → Publicar** tab:
+
+1. Select a generation from the gallery
+2. Choose which connected account to publish to
+3. Optionally edit the caption
+4. Click Publish → the API posts directly via Meta Graph API
+
+**Supported post types:**
+- Single image post (Instagram Feed / Facebook Page)
+- Carousel post (Instagram — up to 10 images)
+- Facebook multi-photo post
+
+#### 11. Going to Production
+
+Before making the app available to all users:
+
+1. Complete **App Review** on Meta Developer dashboard
+2. Submit the 4 required permissions for review
+3. Provide a screencast showing how your app uses each permission
+4. Set the app from **Development** to **Live** mode
+5. Update your OAuth redirect URIs to only include production URLs
+
+> App Review typically takes 1-5 business days. During development, the app works for admins and testers without review.
 
 ### Running Locally
 
@@ -836,6 +997,25 @@ All API routes run with `maxDuration: 300` (5 minutes) on Vercel.
 | `GET/POST/PUT/DELETE` | `/api/api-keys` | API key management |
 | `GET` | `/api/reports` | Performance reports |
 
+### Integration Routes
+
+| Method | Route | Description |
+|---|---|---|
+| `GET` | `/api/integrations/meta` | List connected Meta accounts |
+| `POST` | `/api/integrations/meta` | Connect, disconnect, refresh token, or publish |
+| `GET` | `/api/integrations/meta/callback` | OAuth callback (handles Facebook redirect) |
+| `POST` | `/api/integrations/export` | Export images in multiple formats (PNG/JPG/WebP/PDF) |
+| `GET` | `/api/integrations/schedule` | List scheduled posts |
+| `POST` | `/api/integrations/schedule` | Create, update, cancel, or retry scheduled posts |
+
+### Collaboration Routes
+
+| Method | Route | Description |
+|---|---|---|
+| `GET/POST/PUT/DELETE` | `/api/collaboration/share` | Share generations with others |
+| `GET/POST/PUT/DELETE` | `/api/collaboration/comments` | Comments on images |
+| `GET/POST/PUT` | `/api/collaboration/approvals` | Approval workflow |
+
 ### Public API
 
 | Method | Route | Description |
@@ -1142,6 +1322,70 @@ jobs:
 | `permissions` | string[] | Allowed actions |
 | `rateLimit` | number | Requests per minute |
 
+#### `meta_connections`
+
+| Field | Type | Description |
+|---|---|---|
+| `userId` | string | User UID |
+| `accountType` | string | `instagram_business` or `facebook_page` |
+| `accountId` | string | Meta account ID |
+| `accountName` | string | Account display name |
+| `accountUsername` | string | Instagram @username (if applicable) |
+| `accountAvatar` | string | Profile picture URL |
+| `accessToken` | string | AES-256-CBC encrypted long-lived token |
+| `tokenExpiresAt` | timestamp | Token expiration date (~60 days) |
+| `permissions` | string[] | Granted permissions |
+| `isActive` | boolean | Whether connection is active |
+
+#### `scheduled_posts`
+
+| Field | Type | Description |
+|---|---|---|
+| `userId` | string | User UID |
+| `generationId` | string | Source generation ID |
+| `connectionId` | string | Meta connection ID |
+| `platform` | string | Target platform |
+| `imageUrls` | string[] | Image URLs to publish |
+| `caption` | string | Post caption text |
+| `scheduledAt` | timestamp | When to publish |
+| `publishedAt` | timestamp | Actual publish time (if published) |
+| `status` | string | scheduled / publishing / published / failed / cancelled |
+| `externalPostId` | string | Meta post ID (after publishing) |
+| `retryCount` | number | Number of retry attempts |
+
+#### `shared_generations`
+
+| Field | Type | Description |
+|---|---|---|
+| `generationId` | string | Source generation ID |
+| `ownerId` | string | Owner UID |
+| `sharedWith` | object[] | Recipients with permission level |
+| `publicLink` | string | Optional public share URL |
+| `expiresAt` | timestamp | Optional link expiration |
+
+#### `generation_comments`
+
+| Field | Type | Description |
+|---|---|---|
+| `generationId` | string | Generation ID |
+| `userId` | string | Commenter UID |
+| `userName` | string | Commenter name |
+| `text` | string | Comment text |
+| `imageIndex` | number | Which image in the generation |
+| `pinX` / `pinY` | number | Pin position on image (0-1 normalized) |
+| `parentId` | string | Parent comment ID (for threads) |
+| `isResolved` | boolean | Whether issue is resolved |
+
+#### `generation_approvals`
+
+| Field | Type | Description |
+|---|---|---|
+| `generationId` | string | Generation ID |
+| `requesterId` | string | Person requesting approval |
+| `reviewers` | object[] | Reviewers with status (pending/approved/changes_requested/rejected) |
+| `status` | string | Overall approval status |
+| `comments` | string | Reviewer notes |
+
 ---
 
 ## 🛡 Security
@@ -1150,9 +1394,11 @@ jobs:
 |---|---|
 | **System API keys** | Server-side only env vars (never exposed to client) |
 | **User API keys** | Encrypted in Firestore (BYO keys tier) |
+| **Meta tokens** | AES-256-CBC encrypted with random IV, stored in Firestore, 60-day expiry |
+| **OAuth flow** | Popup-based (no full-page redirect), postMessage communication, origin-verified |
 | **Authentication** | Firebase Auth with JWT tokens validated server-side |
 | **Authorization** | Firestore rules + server-side role checks |
-| **Rate limiting** | Daily spend limit per user + retry with backoff on external APIs |
+| **Rate limiting** | Per-API-key rate limits + retry with backoff on external APIs |
 | **API keys** | SHA-256 hashed, per-key permissions, per-key rate limits |
 | **File uploads** | MIME type validation + size limits |
 | **Input sanitization** | All inputs sanitized before sending to AI models |

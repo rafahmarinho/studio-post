@@ -87,10 +87,12 @@ export default function IntegrationsPage() {
       const res = await fetch('/api/integrations/meta', {
         headers: { Authorization: `Bearer ${token}` },
       })
-      const data = await res.json()
-      setConnections(data.connections || [])
+      if (res.ok) {
+        const data = await res.json()
+        setConnections(data.connections || [])
+      }
     } catch {
-      toast.error('Erro ao carregar conexões')
+      // Meta not configured — connections stay empty
     } finally {
       setLoadingConnections(false)
     }
@@ -104,17 +106,58 @@ export default function IntegrationsPage() {
     if (user) loadHistory(user.uid)
   }, [user, loadHistory])
 
-  async function handleConnect() {
-    // Meta OAuth flow — redirect
+  // Listen for OAuth callback from popup window
+  useEffect(() => {
+    function handleMessage(e: MessageEvent) {
+      if (e.origin !== window.location.origin) return
+      if (e.data?.type !== 'META_OAUTH_CALLBACK') return
+
+      if (e.data.success && e.data.accessToken) {
+        // Exchange short-lived token for long-lived via our API
+        exchangeToken(e.data.accessToken, connectAccountType)
+      } else {
+        toast.error(e.data.error || 'Erro na conexão com o Meta')
+      }
+    }
+    window.addEventListener('message', handleMessage)
+    return () => window.removeEventListener('message', handleMessage)
+  })
+
+  const [connectAccountType, setConnectAccountType] = useState<'instagram_business' | 'facebook_page'>('instagram_business')
+
+  async function exchangeToken(shortLivedToken: string, accountType: string) {
+    if (!user) return
+    try {
+      const token = await user.getIdToken()
+      const res = await fetch('/api/integrations/meta', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ action: 'exchange_token', shortLivedToken, accountType }),
+      })
+      const data = await res.json()
+      if (data.error) throw new Error(data.error)
+      toast.success(`${accountType === 'instagram_business' ? 'Instagram' : 'Facebook'} conectado!`)
+      loadConnections()
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Erro ao trocar token')
+    }
+  }
+
+  function handleConnect(accountType: 'instagram_business' | 'facebook_page' = 'instagram_business') {
     const appId = process.env.NEXT_PUBLIC_META_APP_ID
     if (!appId) {
-      toast.error('Meta App ID não configurado')
+      toast.error('Configure a variável NEXT_PUBLIC_META_APP_ID no .env para conectar com o Meta. Consulte o README para mais detalhes.')
       return
     }
+    setConnectAccountType(accountType)
     const redirectUri = `${window.location.origin}/api/integrations/meta/callback`
     const scope = 'pages_manage_posts,pages_read_engagement,instagram_basic,instagram_content_publish'
     const url = `https://www.facebook.com/v21.0/dialog/oauth?client_id=${appId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scope}&response_type=code`
-    window.location.href = url
+    // Open in popup instead of redirect (better UX)
+    const w = 600, h = 700
+    const left = window.screenX + (window.outerWidth - w) / 2
+    const top = window.screenY + (window.outerHeight - h) / 2
+    window.open(url, 'meta_oauth', `width=${w},height=${h},left=${left},top=${top},toolbar=no,menubar=no`)
   }
 
   async function handleDisconnect(connectionId: string) {
@@ -245,7 +288,7 @@ export default function IntegrationsPage() {
         <TabsContent value="connections" className="space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold">Contas Conectadas</h2>
-            <Button onClick={handleConnect} disabled={connecting}>
+            <Button onClick={() => handleConnect()} disabled={connecting}>
               {connecting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Link2 className="h-4 w-4 mr-2" />}
               Conectar Meta
             </Button>
@@ -263,7 +306,7 @@ export default function IntegrationsPage() {
                 <p className="text-sm text-muted-foreground mb-4">
                   Conecte sua conta do Instagram ou Facebook para publicar diretamente
                 </p>
-                <Button onClick={handleConnect}>
+                <Button onClick={() => handleConnect()}>
                   <Link2 className="h-4 w-4 mr-2" />
                   Conectar Meta
                 </Button>

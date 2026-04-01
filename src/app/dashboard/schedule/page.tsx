@@ -94,18 +94,24 @@ export default function SchedulePage() {
     setLoading(true)
     try {
       await Promise.all([
-        loadScheduledPosts(user.uid),
-        loadHistory(user.uid),
+        loadScheduledPosts(user.uid).catch(() => {}),
+        loadHistory(user.uid).catch(() => {}),
       ])
-      // Load connections
-      const token = await user.getIdToken()
-      const res = await fetch('/api/integrations/meta', {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      const data = await res.json()
-      setConnections(data.connections || [])
+      // Load connections — separate try/catch so page works without Meta configured
+      try {
+        const token = await user.getIdToken()
+        const res = await fetch('/api/integrations/meta', {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        if (res.ok) {
+          const data = await res.json()
+          setConnections(data.connections || [])
+        }
+      } catch {
+        // Meta not configured — connections stay empty
+      }
     } catch {
-      toast.error('Erro ao carregar dados')
+      // Silently fail on initial load — empty state will be shown
     } finally {
       setLoading(false)
     }
