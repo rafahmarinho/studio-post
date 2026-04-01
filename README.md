@@ -99,7 +99,7 @@ It ships as both a **web application** (Next.js on Vercel) and a **desktop appli
 | **Streaming** | Images appear in real time as they are generated |
 | **Multi-platform** | Optimized formats for Instagram, Facebook, LinkedIn, TikTok, YouTube, etc. |
 | **Progressive discounts** | 5%–30% off for batches of 6–30 items |
-| **Cost control** | Configurable daily limit + admin cost dashboard |
+| **Cost control** | Admin cost dashboard with per-user breakdown |
 | **3 usage modes** | Own API keys / Free tier (5/day) / Pay-per-batch |
 | **Cross-platform desktop** | Electron app with tray icon, auto-update, offline mode |
 
@@ -237,11 +237,6 @@ OPEN_API_KEY=sk-...
 # STRIPE_WEBHOOK_SECRET=whsec_...
 # NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...
 
-# ──────────────────────────────────────────────
-# Optional: Custom limits
-# ──────────────────────────────────────────────
-# DAILY_LIMIT_CENTS=30000          # R$ 300.00 default
-# FREE_DAILY_IMAGE_LIMIT=5         # 5 images/day for free tier
 ```
 
 ### Firebase Setup
@@ -779,8 +774,7 @@ Admin-only page showing all spending across the platform.
 | Tier | Description | Cost to User | Cost to You |
 |---|---|---|---|
 | **own_keys** | User provides their own Gemini/OpenAI API keys | Only API provider cost | Zero |
-| **free** | 5 images/day + 2 refinements/day, resets at midnight UTC | Free | Your API key |
-| **paid** | Pay per batch, progressive discounts, R$ 300/day limit | Per-batch pricing | Your API key |
+| **paid** | Pay per batch, progressive discounts, unlimited usage | Per-batch pricing | Your API key |
 
 ### Role-Based Access
 
@@ -801,10 +795,6 @@ Admin-only page showing all spending across the platform.
 | Captions only | R$ 1.00 |
 | Images + Captions | R$ 3.50 |
 | Refinement | R$ 0.99 (fixed) |
-
-### Daily Limit
-
-Default: **R$ 300.00 per user/day** (configurable via `DAILY_LIMIT_CENTS` env var or per-tenant settings).
 
 ### Actual API Costs (reference)
 

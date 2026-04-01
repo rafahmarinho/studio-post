@@ -401,11 +401,7 @@ export interface RefineResult {
   version: number
 }
 
-export interface DailyLimitResult {
-  allowed: boolean
-  spent: number
-  remaining: number
-}
+
 
 // ==================== GENERATION PHASE ====================
 
@@ -570,7 +566,6 @@ export const TENANT_PLAN_LIMITS: Record<TenantPlan, { members: number; dailyImag
 export interface TenantSettings {
   allowMemberOwnKeys: boolean
   defaultTier: 'own_keys' | 'paid'
-  dailyLimitCents: number
   watermark?: string
   customDomain?: string
   webhookUrl?: string

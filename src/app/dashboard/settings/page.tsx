@@ -114,7 +114,7 @@ export default function SettingsPage() {
           <p className="text-sm text-muted-foreground">
             {userDoc?.tier === 'own_keys'
               ? 'Sem limites — você usa suas próprias chaves de API.'
-              : 'Pay-as-you-go com R$ 300,00 de limite diário.'}
+              : 'Pay-as-you-go — pague apenas pelo que usar.'}
           </p>
           <p className="text-xs text-muted-foreground">
             Para mudar para o modo BYO Keys, basta adicionar suas chaves de API abaixo.

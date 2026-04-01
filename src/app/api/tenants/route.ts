@@ -100,7 +100,6 @@ export async function POST(request: NextRequest) {
       settings: {
         allowMemberOwnKeys: body.settings?.allowMemberOwnKeys ?? true,
         defaultTier: body.settings?.defaultTier || 'paid',
-        dailyLimitCents: body.settings?.dailyLimitCents || 30000,
         watermark: body.settings?.watermark || null,
         customDomain: null,
         webhookUrl: null,

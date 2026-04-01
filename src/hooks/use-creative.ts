@@ -9,7 +9,6 @@ import {
   getGenerationsByUser,
   getAllGenerations,
   recordCost,
-  getDailySpentByUser,
   getCostsSummary,
   getBrandKitsByUser,
   getTemplatesByUser,
@@ -20,7 +19,6 @@ import {
   getApprovalsByUser,
 } from '@/lib/creative-service'
 import {
-  DAILY_LIMIT_CENTS,
   REFINE_COST_CENTS,
   UPSCALE_COST_CENTS,
   BG_REMOVAL_COST_CENTS,
@@ -36,7 +34,6 @@ import type {
   CreativeBriefData,
   RefineParams,
   RefineResult,
-  DailyLimitResult,
   GenerationPhase,
   UpscaleRequest,
   UpscaleResult,
@@ -77,17 +74,6 @@ export function useCreative() {
 
   const abortRef = useRef(false)
 
-  // ==================== DAILY LIMIT ====================
-
-  const checkDailyLimit = useCallback(
-    async (userId: string, estimatedCostCents: number): Promise<DailyLimitResult> => {
-      const spent = await getDailySpentByUser(userId)
-      const allowed = spent + estimatedCostCents <= DAILY_LIMIT_CENTS
-      return { allowed, spent, remaining: DAILY_LIMIT_CENTS - spent }
-    },
-    []
-  )
-
   // ==================== UPLOAD HELPERS ====================
 
   async function uploadFile(
@@ -126,16 +112,6 @@ export function useCreative() {
         // Calculate cost
         const unitPrice = getUnitPrice(brief.generationMode, totalImages)
         const totalCost = calculateTotalCost(brief.generationMode, totalImages)
-
-        // Check daily limit (skip for own_keys tier)
-        if (userDoc.tier === 'paid') {
-          const limit = await checkDailyLimit(user.uid, totalCost)
-          if (!limit.allowed) {
-            throw new Error(
-              `Limite diário excedido. Gasto hoje: R$ ${(limit.spent / 100).toFixed(2)}. Restante: R$ ${(limit.remaining / 100).toFixed(2)}`
-            )
-          }
-        }
 
         // Create generation document
         setGenerationPhase('uploading')
@@ -397,7 +373,7 @@ export function useCreative() {
         setGenerating(false)
       }
     },
-    [user, userDoc, checkDailyLimit]
+    [user, userDoc]
   )
 
   // ==================== REFINE ====================
@@ -408,14 +384,6 @@ export function useCreative() {
 
       setRefining(true)
       try {
-        // Check daily limit for paid tier
-        if (userDoc.tier === 'paid') {
-          const limit = await checkDailyLimit(user.uid, REFINE_COST_CENTS)
-          if (!limit.allowed) {
-            throw new Error('Limite diário excedido para refinamento')
-          }
-        }
-
         const res = await fetch('/api/creative/refine', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -484,7 +452,7 @@ export function useCreative() {
         setRefining(false)
       }
     },
-    [user, userDoc, checkDailyLimit, imageVersions]
+    [user, userDoc, imageVersions]
   )
 
   // ==================== INIT VERSIONS ====================
@@ -532,12 +500,6 @@ export function useCreative() {
       try {
         const costCents = UPSCALE_COST_CENTS[params.scale]
 
-        if (userDoc.tier === 'paid') {
-          const limit = await checkDailyLimit(user.uid, costCents)
-          if (!limit.allowed) {
-            throw new Error('Limite diário excedido para upscaling')
-          }
-        }
 
         const res = await fetch('/api/creative/upscale', {
           method: 'POST',
@@ -575,7 +537,7 @@ export function useCreative() {
         setUpscaling(false)
       }
     },
-    [user, userDoc, checkDailyLimit]
+    [user, userDoc]
   )
 
   // ==================== REMOVE BACKGROUND ====================
@@ -586,13 +548,6 @@ export function useCreative() {
 
       setRemovingBg(true)
       try {
-        if (userDoc.tier === 'paid') {
-          const limit = await checkDailyLimit(user.uid, BG_REMOVAL_COST_CENTS)
-          if (!limit.allowed) {
-            throw new Error('Limite diário excedido para remoção de fundo')
-          }
-        }
-
         const res = await fetch('/api/creative/remove-background', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -629,7 +584,7 @@ export function useCreative() {
         setRemovingBg(false)
       }
     },
-    [user, userDoc, checkDailyLimit]
+    [user, userDoc]
   )
 
   // ==================== VARIATIONS ====================
@@ -640,13 +595,6 @@ export function useCreative() {
 
       setGeneratingVariations(true)
       try {
-        if (userDoc.tier === 'paid') {
-          const limit = await checkDailyLimit(user.uid, VARIATION_COST_CENTS)
-          if (!limit.allowed) {
-            throw new Error('Limite diário excedido para variações')
-          }
-        }
-
         const res = await fetch('/api/creative/variations', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -683,7 +631,7 @@ export function useCreative() {
         setGeneratingVariations(false)
       }
     },
-    [user, userDoc, checkDailyLimit]
+    [user, userDoc]
   )
 
   // ==================== BRAND KITS ====================
@@ -971,7 +919,6 @@ export function useCreative() {
     removeBackground,
     generateVariations,
     initVersions,
-    checkDailyLimit,
     loadHistory,
     loadCosts,
     loadBrandKits,

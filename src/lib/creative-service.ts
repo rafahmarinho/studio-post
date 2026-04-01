@@ -163,19 +163,6 @@ export async function recordCost(
   return docRef.id
 }
 
-export async function getDailySpentByUser(userId: string): Promise<number> {
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-
-  const q = query(
-    collection(db, COSTS_COLLECTION),
-    where('userId', '==', userId),
-    where('createdAt', '>=', Timestamp.fromDate(today))
-  )
-  const snap = await getDocs(q)
-  return snap.docs.reduce((sum, d) => sum + (d.data().totalCost || 0), 0)
-}
-
 export async function getCostsSummary(): Promise<CostsSummary> {
   const snap = await getDocs(
     query(collection(db, COSTS_COLLECTION), orderBy('createdAt', 'desc'))

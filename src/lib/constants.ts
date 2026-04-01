@@ -2,7 +2,7 @@ import { GenerationMode } from '@/types'
 
 // ==================== CONSTANTES DE PREÇO ====================
 
-export const DAILY_LIMIT_CENTS = 30000 // R$ 300,00
+
 export const REFINE_COST_CENTS = 99 // R$ 0,99
 
 export const BASE_PRICE: Record<GenerationMode, number> = {

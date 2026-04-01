@@ -352,7 +352,7 @@ export default function LandingPage() {
                 </div>
                 <p className="text-sm text-muted-foreground mb-6">Img + legenda. Desconto por volume.</p>
                 <ul className="space-y-2.5 text-sm mb-8">
-                  {['Até 30% de desconto por lote', 'Limite diário de R$ 300', 'Refinamento: R$ 0,99/imagem', 'Dashboard completo de custos', 'Sem configuração de keys'].map((f) => (
+                  {['Até 30% de desconto por lote', 'Pague apenas pelo que usar', 'Refinamento: R$ 0,99/imagem', 'Dashboard completo de custos', 'Sem configuração de keys'].map((f) => (
                     <li key={f} className="flex items-start gap-2">
                       <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
                       {f}
