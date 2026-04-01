@@ -140,11 +140,12 @@ export async function getGenerationsByUser(
 ): Promise<CreativeGeneration[]> {
   const q = query(
     collection(db, GENERATIONS_COLLECTION),
-    where('userId', '==', userId),
-    orderBy('createdAt', 'desc')
+    where('userId', '==', userId)
   )
   const snap = await getDocs(q)
-  return snap.docs.map(convertGeneration)
+  return snap.docs.map(convertGeneration).sort(
+    (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
+  )
 }
 
 export async function deleteGeneration(id: string): Promise<void> {
@@ -226,11 +227,12 @@ function convertBrandKit(docSnap: DocumentSnapshot): BrandKit {
 export async function getBrandKitsByUser(userId: string): Promise<BrandKit[]> {
   const q = query(
     collection(db, BRAND_KITS_COLLECTION),
-    where('userId', '==', userId),
-    orderBy('updatedAt', 'desc')
+    where('userId', '==', userId)
   )
   const snap = await getDocs(q)
-  return snap.docs.map(convertBrandKit)
+  return snap.docs.map(convertBrandKit).sort(
+    (a, b) => b.updatedAt.getTime() - a.updatedAt.getTime()
+  )
 }
 
 export async function getBrandKitById(id: string): Promise<BrandKit | null> {
@@ -288,45 +290,27 @@ export async function getTemplatesByUser(
   userId: string,
   category?: TemplateCategory
 ): Promise<CreativeTemplate[]> {
-  let q = query(
-    collection(db, TEMPLATES_COLLECTION),
-    where('userId', '==', userId),
-    orderBy('updatedAt', 'desc')
-  )
+  const constraints = [where('userId', '==', userId)]
+  if (category) constraints.push(where('category', '==', category))
 
-  if (category) {
-    q = query(
-      collection(db, TEMPLATES_COLLECTION),
-      where('userId', '==', userId),
-      where('category', '==', category),
-      orderBy('updatedAt', 'desc')
-    )
-  }
-
+  const q = query(collection(db, TEMPLATES_COLLECTION), ...constraints)
   const snap = await getDocs(q)
-  return snap.docs.map(convertTemplate)
+  return snap.docs.map(convertTemplate).sort(
+    (a, b) => b.updatedAt.getTime() - a.updatedAt.getTime()
+  )
 }
 
 export async function getPublicTemplates(
   category?: TemplateCategory
 ): Promise<CreativeTemplate[]> {
-  let q = query(
-    collection(db, TEMPLATES_COLLECTION),
-    where('isPublic', '==', true),
-    orderBy('usageCount', 'desc')
-  )
+  const constraints = [where('isPublic', '==', true)]
+  if (category) constraints.push(where('category', '==', category))
 
-  if (category) {
-    q = query(
-      collection(db, TEMPLATES_COLLECTION),
-      where('isPublic', '==', true),
-      where('category', '==', category),
-      orderBy('usageCount', 'desc')
-    )
-  }
-
+  const q = query(collection(db, TEMPLATES_COLLECTION), ...constraints)
   const snap = await getDocs(q)
-  return snap.docs.map(convertTemplate)
+  return snap.docs.map(convertTemplate).sort(
+    (a, b) => (b.usageCount || 0) - (a.usageCount || 0)
+  )
 }
 
 export async function getTemplateById(id: string): Promise<CreativeTemplate | null> {
@@ -367,8 +351,7 @@ const SCHEDULED_COLLECTION = 'scheduled_posts'
 export async function getScheduledPostsByUser(userId: string): Promise<ScheduledPost[]> {
   const q = query(
     collection(db, SCHEDULED_COLLECTION),
-    where('userId', '==', userId),
-    orderBy('scheduledAt', 'asc')
+    where('userId', '==', userId)
   )
   const snap = await getDocs(q)
   return snap.docs.map((d) => {
@@ -392,7 +375,9 @@ export async function getScheduledPostsByUser(userId: string): Promise<Scheduled
       createdAt: toDateSafe(data.createdAt),
       updatedAt: toDateSafe(data.updatedAt),
     } as ScheduledPost
-  })
+  }).sort(
+    (a, b) => a.scheduledAt.getTime() - b.scheduledAt.getTime()
+  )
 }
 
 // ==================== SHARED GENERATIONS (client-side read) ====================
@@ -402,8 +387,7 @@ const SHARES_COLLECTION = 'shared_generations'
 export async function getSharesByUser(userId: string): Promise<SharedGeneration[]> {
   const q = query(
     collection(db, SHARES_COLLECTION),
-    where('sharedBy', '==', userId),
-    orderBy('createdAt', 'desc')
+    where('sharedBy', '==', userId)
   )
   const snap = await getDocs(q)
   return snap.docs.map((d) => {
@@ -418,7 +402,9 @@ export async function getSharesByUser(userId: string): Promise<SharedGeneration[
       expiresAt: data.expiresAt ? toDateSafe(data.expiresAt) : undefined,
       createdAt: toDateSafe(data.createdAt),
     } as SharedGeneration
-  })
+  }).sort(
+    (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
+  )
 }
 
 // ==================== COMMENTS (client-side read) ====================
@@ -428,8 +414,7 @@ const COMMENTS_COLLECTION = 'image_comments'
 export async function getCommentsByGeneration(generationId: string): Promise<ImageComment[]> {
   const q = query(
     collection(db, COMMENTS_COLLECTION),
-    where('generationId', '==', generationId),
-    orderBy('createdAt', 'asc')
+    where('generationId', '==', generationId)
   )
   const snap = await getDocs(q)
   return snap.docs.map((d) => {
@@ -449,7 +434,9 @@ export async function getCommentsByGeneration(generationId: string): Promise<Ima
       createdAt: toDateSafe(data.createdAt),
       updatedAt: toDateSafe(data.updatedAt),
     } as ImageComment
-  })
+  }).sort(
+    (a, b) => a.createdAt.getTime() - b.createdAt.getTime()
+  )
 }
 
 // ==================== APPROVAL REQUESTS (client-side read) ====================
@@ -459,8 +446,7 @@ const APPROVALS_COLLECTION = 'approval_requests'
 export async function getApprovalsByUser(userId: string): Promise<ApprovalRequest[]> {
   const q = query(
     collection(db, APPROVALS_COLLECTION),
-    where('requestedBy', '==', userId),
-    orderBy('createdAt', 'desc')
+    where('requestedBy', '==', userId)
   )
   const snap = await getDocs(q)
   return snap.docs.map((d) => {
@@ -480,5 +466,7 @@ export async function getApprovalsByUser(userId: string): Promise<ApprovalReques
       createdAt: toDateSafe(data.createdAt),
       updatedAt: toDateSafe(data.updatedAt),
     } as ApprovalRequest
-  })
+  }).sort(
+    (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
+  )
 }

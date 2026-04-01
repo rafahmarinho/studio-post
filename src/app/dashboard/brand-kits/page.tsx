@@ -63,8 +63,9 @@ export default function BrandKitsPage() {
     try {
       const data = await getBrandKitsByUser(user.uid)
       setKits(data)
-    } catch {
-      toast.error('Erro ao carregar brand kits')
+    } catch (err) {
+      console.warn('Brand kits load:', err)
+      setKits([])
     } finally {
       setLoading(false)
     }

@@ -82,8 +82,9 @@ export default function TemplatesPage() {
         }
       }
       setTemplates(merged)
-    } catch {
-      toast.error('Erro ao carregar templates')
+    } catch (err) {
+      console.warn('Templates load:', err)
+      setTemplates([])
     } finally {
       setLoading(false)
     }
