@@ -1,6 +1,7 @@
 'use client'
 
 import { Progress } from '@/components/ui/progress'
+import Image from 'next/image'
 import { AlertTriangle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -41,9 +42,11 @@ export function StreamingGrid({
             key={i}
             className="relative aspect-square rounded-lg overflow-hidden border bg-muted"
           >
-            <img
+            <Image
               src={url}
               alt={`Imagem ${i + 1}`}
+              width={512}
+              height={512}
               className="w-full h-full object-cover"
             />
             <div className="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full">

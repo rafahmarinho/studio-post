@@ -1,6 +1,7 @@
 'use client'
 
 import { Badge } from '@/components/ui/badge'
+import Image from 'next/image'
 import { Expand } from 'lucide-react'
 import type { GeneratedCaption } from '@/types'
 import { CaptionCard } from './caption-card'
@@ -32,9 +33,11 @@ export function ResultsGrid({
               className="relative aspect-square cursor-pointer overflow-hidden"
               onClick={() => onImageClick(i)}
             >
-              <img
+              <Image
                 src={latestUrl}
                 alt={`Imagem ${i + 1}`}
+                width={512}
+                height={512}
                 className="w-full h-full object-cover transition-transform group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">

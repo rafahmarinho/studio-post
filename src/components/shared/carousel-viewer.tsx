@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
@@ -66,9 +67,11 @@ export function CarouselViewer({
                     className="aspect-square rounded-lg overflow-hidden bg-muted cursor-pointer"
                     onClick={() => onImageClick(globalIdx)}
                   >
-                    <img
+                    <Image
                       src={latestUrl}
                       alt={`Slide ${activeSlide + 1}`}
+                      width={1024}
+                      height={1024}
                       className="w-full h-full object-cover"
                     />
                     {versions.length > 1 && (
@@ -142,9 +145,11 @@ export function CarouselViewer({
                           }))
                         }
                       >
-                        <img
+                        <Image
                           src={thumbUrl}
                           alt={`Slide ${slideIdx + 1}`}
+                          width={56}
+                          height={56}
                           className="w-full h-full object-cover"
                         />
                       </button>

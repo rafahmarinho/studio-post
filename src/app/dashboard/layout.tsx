@@ -20,6 +20,9 @@ import {
   BarChart3,
   ChevronsLeft,
   ChevronsRight,
+  Plug,
+  CalendarClock,
+  Users,
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -29,6 +32,9 @@ const NAV_ITEMS = [
   { href: '/dashboard/history', label: 'Histórico', icon: History },
   { href: '/dashboard/brand-kits', label: 'Brand Kits', icon: Palette },
   { href: '/dashboard/templates', label: 'Templates', icon: LayoutTemplate },
+  { href: '/dashboard/integrations', label: 'Integrações', icon: Plug },
+  { href: '/dashboard/schedule', label: 'Agendamento', icon: CalendarClock },
+  { href: '/dashboard/collaboration', label: 'Colaboração', icon: Users },
   { href: '/dashboard/reports', label: 'Relatórios', icon: BarChart3 },
   { href: '/dashboard/costs', label: 'Custos', icon: DollarSign },
   { href: '/dashboard/workspace', label: 'Workspace', icon: Building2 },

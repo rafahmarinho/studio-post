@@ -14,6 +14,10 @@ import {
   getBrandKitsByUser,
   getTemplatesByUser,
   getPublicTemplates,
+  getScheduledPostsByUser,
+  getSharesByUser,
+  getCommentsByGeneration,
+  getApprovalsByUser,
 } from '@/lib/creative-service'
 import {
   DAILY_LIMIT_CENTS,
@@ -43,6 +47,11 @@ import type {
   BrandKit,
   CreativeTemplate,
   TemplateCategory,
+  ScheduledPost,
+  SharedGeneration,
+  ImageComment,
+  ApprovalRequest,
+  ExportFormat,
 } from '@/types'
 import { useAuth } from '@/lib/auth-context'
 
@@ -730,7 +739,216 @@ export function useCreative() {
     }
   }, [])
 
+  // ==================== INTEGRATIONS — SCHEDULE ====================
+
+  const [scheduledPosts, setScheduledPosts] = useState<ScheduledPost[]>([])
+
+  const loadScheduledPosts = useCallback(async (userId: string) => {
+    try {
+      const data = await getScheduledPostsByUser(userId)
+      setScheduledPosts(data)
+    } catch (error) {
+      console.error('Load scheduled posts error:', error)
+    }
+  }, [])
+
+  const schedulePost = useCallback(
+    async (params: {
+      generationId: string
+      connectionId: string
+      platform: string
+      imageUrls: string[]
+      caption?: string
+      scheduledAt: string
+    }) => {
+      if (!user) return null
+      const token = await user.getIdToken()
+      const res = await fetch('/api/integrations/schedule', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ action: 'create', ...params }),
+      })
+      const data = await res.json()
+      if (data.error) throw new Error(data.error)
+      return data
+    },
+    [user]
+  )
+
+  const cancelScheduledPost = useCallback(
+    async (postId: string) => {
+      if (!user) return
+      const token = await user.getIdToken()
+      const res = await fetch('/api/integrations/schedule', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ action: 'cancel', postId }),
+      })
+      const data = await res.json()
+      if (data.error) throw new Error(data.error)
+    },
+    [user]
+  )
+
+  // ==================== INTEGRATIONS — EXPORT ====================
+
+  const exportImages = useCallback(
+    async (imageUrls: string[], format: ExportFormat, generationId: string, quality?: number) => {
+      if (!user) return null
+      const token = await user.getIdToken()
+      const res = await fetch('/api/integrations/export', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ imageUrls, format, quality, generationId }),
+      })
+      const data = await res.json()
+      if (data.error) throw new Error(data.error)
+      return data
+    },
+    [user]
+  )
+
+  // ==================== INTEGRATIONS — META PUBLISH ====================
+
+  const publishToMeta = useCallback(
+    async (connectionId: string, imageUrls: string[], caption?: string, isCarousel?: boolean) => {
+      if (!user) return null
+      const token = await user.getIdToken()
+      const res = await fetch('/api/integrations/meta', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ action: 'publish', connectionId, imageUrls, caption, isCarousel }),
+      })
+      const data = await res.json()
+      if (data.error) throw new Error(data.error)
+      return data
+    },
+    [user]
+  )
+
+  // ==================== COLLABORATION — SHARE ====================
+
+  const [shares, setShares] = useState<SharedGeneration[]>([])
+
+  const loadShares = useCallback(async (userId: string) => {
+    try {
+      const data = await getSharesByUser(userId)
+      setShares(data)
+    } catch (error) {
+      console.error('Load shares error:', error)
+    }
+  }, [])
+
+  const shareGeneration = useCallback(
+    async (params: {
+      generationId: string
+      recipients?: Array<{ email: string; permission: string }>
+      publicLinkEnabled?: boolean
+      expiresInDays?: number
+    }) => {
+      if (!user) return null
+      const token = await user.getIdToken()
+      const res = await fetch('/api/collaboration/share', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ action: 'create', ...params }),
+      })
+      const data = await res.json()
+      if (data.error) throw new Error(data.error)
+      return data
+    },
+    [user]
+  )
+
+  // ==================== COLLABORATION — COMMENTS ====================
+
+  const [comments, setComments] = useState<ImageComment[]>([])
+
+  const loadComments = useCallback(async (generationId: string) => {
+    try {
+      const data = await getCommentsByGeneration(generationId)
+      setComments(data)
+    } catch (error) {
+      console.error('Load comments error:', error)
+    }
+  }, [])
+
+  const addComment = useCallback(
+    async (params: {
+      generationId: string
+      imageIndex: number
+      content: string
+      pinX?: number
+      pinY?: number
+      parentId?: string
+    }) => {
+      if (!user) return null
+      const token = await user.getIdToken()
+      const res = await fetch('/api/collaboration/comments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ action: 'create', ...params }),
+      })
+      const data = await res.json()
+      if (data.error) throw new Error(data.error)
+      setComments((prev) => [...prev, data])
+      return data
+    },
+    [user]
+  )
+
+  // ==================== COLLABORATION — APPROVALS ====================
+
+  const [approvals, setApprovals] = useState<ApprovalRequest[]>([])
+
+  const loadApprovals = useCallback(async (userId: string) => {
+    try {
+      const data = await getApprovalsByUser(userId)
+      setApprovals(data)
+    } catch (error) {
+      console.error('Load approvals error:', error)
+    }
+  }, [])
+
+  const requestApproval = useCallback(
+    async (params: {
+      generationId: string
+      reviewers: Array<{ userId: string; email: string; displayName: string }>
+      message?: string
+      dueDays?: number
+    }) => {
+      if (!user) return null
+      const token = await user.getIdToken()
+      const res = await fetch('/api/collaboration/approvals', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ action: 'create', ...params }),
+      })
+      const data = await res.json()
+      if (data.error) throw new Error(data.error)
+      return data
+    },
+    [user]
+  )
+
+  const reviewApproval = useCallback(
+    async (requestId: string, status: 'approved' | 'changes_requested' | 'rejected', comment?: string) => {
+      if (!user) return null
+      const token = await user.getIdToken()
+      const res = await fetch('/api/collaboration/approvals', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ action: 'review', requestId, status, comment }),
+      })
+      const data = await res.json()
+      if (data.error) throw new Error(data.error)
+      return data
+    },
+    [user]
+  )
+
   return {
+    // Existing
     generations,
     costsSummary,
     loading,
@@ -761,5 +979,23 @@ export function useCreative() {
     getDiscount,
     getUnitPrice,
     calculateTotalCost,
+    // Integrations
+    scheduledPosts,
+    loadScheduledPosts,
+    schedulePost,
+    cancelScheduledPost,
+    exportImages,
+    publishToMeta,
+    // Collaboration
+    shares,
+    loadShares,
+    shareGeneration,
+    comments,
+    loadComments,
+    addComment,
+    approvals,
+    loadApprovals,
+    requestApproval,
+    reviewApproval,
   }
 }

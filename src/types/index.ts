@@ -690,3 +690,202 @@ export interface CostAnalysis {
   margin: number
   avgRevenuePerUser: number
 }
+
+// ==================== v1.2 — INTEGRATIONS ====================
+
+// --- Meta API (Instagram/Facebook) ---
+
+export type MetaAccountType = 'instagram_business' | 'facebook_page'
+
+export interface MetaConnection {
+  id: string
+  userId: string
+  tenantId?: string
+  accountType: MetaAccountType
+  accountId: string        // IG business account ID or FB page ID
+  accountName: string
+  accountUsername?: string  // @handle
+  accountAvatar?: string
+  accessToken: string      // encrypted long-lived token
+  tokenExpiresAt: Date
+  permissions: string[]    // e.g. ['publish_content','read_insights']
+  isActive: boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
+export const META_ACCOUNT_LABELS: Record<MetaAccountType, string> = {
+  instagram_business: 'Instagram Business',
+  facebook_page: 'Página do Facebook',
+}
+
+// --- Scheduling ---
+
+export type ScheduleStatus = 'scheduled' | 'publishing' | 'published' | 'failed' | 'cancelled'
+
+export interface ScheduledPost {
+  id: string
+  userId: string
+  tenantId?: string
+  generationId: string
+  connectionId: string     // which MetaConnection to publish to
+  platform: ContentPlatform
+  imageUrls: string[]      // which images to publish
+  caption?: string         // formatted caption text
+  scheduledAt: Date        // when to publish (UTC)
+  publishedAt?: Date       // actual publish time
+  status: ScheduleStatus
+  externalPostId?: string  // ID returned by Meta after publishing
+  externalUrl?: string     // permalink to the published post
+  errorMessage?: string
+  retryCount: number
+  createdAt: Date
+  updatedAt: Date
+}
+
+export const SCHEDULE_STATUS_LABELS: Record<ScheduleStatus, string> = {
+  scheduled: 'Agendado',
+  publishing: 'Publicando',
+  published: 'Publicado',
+  failed: 'Falhou',
+  cancelled: 'Cancelado',
+}
+
+export const SCHEDULE_STATUS_COLORS: Record<ScheduleStatus, string> = {
+  scheduled: '#3B82F6',
+  publishing: '#F59E0B',
+  published: '#10B981',
+  failed: '#EF4444',
+  cancelled: '#6B7280',
+}
+
+// --- Export Formats ---
+
+export type ExportFormat = 'png' | 'jpg' | 'webp' | 'pdf'
+
+export interface ExportRequest {
+  imageUrls: string[]
+  format: ExportFormat
+  quality?: number          // 1-100 for jpg/webp
+  generationId: string
+}
+
+export interface ExportResult {
+  downloadUrl: string
+  format: ExportFormat
+  fileSize: number          // bytes
+  fileName: string
+}
+
+// --- Preview Mockup ---
+
+export type MockupDevice = 'iphone_15' | 'android_pixel' | 'ipad' | 'desktop_browser'
+export type MockupPlatform = 'instagram_feed' | 'instagram_stories' | 'facebook_feed' | 'facebook_stories' | 'linkedin_feed' | 'twitter_feed'
+
+export interface MockupConfig {
+  device: MockupDevice
+  platform: MockupPlatform
+  imageUrl: string
+  caption?: string
+  accountName?: string
+  accountAvatar?: string
+  darkMode?: boolean
+}
+
+export const MOCKUP_DEVICE_LABELS: Record<MockupDevice, string> = {
+  iphone_15: 'iPhone 15',
+  android_pixel: 'Android Pixel',
+  ipad: 'iPad',
+  desktop_browser: 'Desktop Browser',
+}
+
+export const MOCKUP_PLATFORM_LABELS: Record<MockupPlatform, string> = {
+  instagram_feed: 'Instagram Feed',
+  instagram_stories: 'Instagram Stories',
+  facebook_feed: 'Facebook Feed',
+  facebook_stories: 'Facebook Stories',
+  linkedin_feed: 'LinkedIn Feed',
+  twitter_feed: 'X (Twitter) Feed',
+}
+
+// ==================== v1.3 — COLLABORATION ====================
+
+// --- Share ---
+
+export type SharePermission = 'view' | 'comment' | 'edit'
+
+export interface SharedGeneration {
+  id: string
+  generationId: string
+  sharedBy: string         // userId who shared
+  sharedWith: SharedRecipient[]
+  publicLink?: string      // optional public share URL token
+  publicLinkEnabled: boolean
+  expiresAt?: Date         // optional expiration
+  createdAt: Date
+}
+
+export interface SharedRecipient {
+  userId?: string          // if shared with a registered user
+  email: string            // invite email
+  permission: SharePermission
+  acceptedAt?: Date
+}
+
+// --- Comments ---
+
+export interface ImageComment {
+  id: string
+  generationId: string
+  imageIndex: number       // which image
+  userId: string
+  userName: string
+  userAvatar?: string
+  content: string
+  pinX?: number            // 0-100 % position for pin on image
+  pinY?: number
+  parentId?: string        // reply to another comment
+  resolved: boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
+// --- Approval Workflow ---
+
+export type ApprovalStatus = 'pending_review' | 'changes_requested' | 'approved' | 'rejected'
+
+export interface ApprovalRequest {
+  id: string
+  generationId: string
+  requestedBy: string      // userId
+  requestedByName: string
+  reviewers: ApprovalReviewer[]
+  status: ApprovalStatus
+  dueDate?: Date
+  message?: string         // cover message from requester
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface ApprovalReviewer {
+  userId: string
+  email: string
+  displayName: string
+  status: ApprovalStatus
+  comment?: string
+  reviewedAt?: Date
+}
+
+export const APPROVAL_STATUS_LABELS: Record<ApprovalStatus, string> = {
+  pending_review: 'Aguardando Revisão',
+  changes_requested: 'Alterações Solicitadas',
+  approved: 'Aprovado',
+  rejected: 'Rejeitado',
+}
+
+export const APPROVAL_STATUS_COLORS: Record<ApprovalStatus, string> = {
+  pending_review: '#F59E0B',
+  changes_requested: '#8B5CF6',
+  approved: '#10B981',
+  rejected: '#EF4444',
+}

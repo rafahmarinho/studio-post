@@ -20,6 +20,10 @@ import type {
   BrandKit,
   CreativeTemplate,
   TemplateCategory,
+  ScheduledPost,
+  SharedGeneration,
+  ImageComment,
+  ApprovalRequest,
 } from '@/types'
 
 const GENERATIONS_COLLECTION = 'creative_generations'
@@ -367,4 +371,127 @@ export async function updateTemplate(
 
 export async function deleteTemplate(id: string): Promise<void> {
   await deleteDoc(doc(db, TEMPLATES_COLLECTION, id))
+}
+
+// ==================== SCHEDULED POSTS (client-side read) ====================
+
+const SCHEDULED_COLLECTION = 'scheduled_posts'
+
+export async function getScheduledPostsByUser(userId: string): Promise<ScheduledPost[]> {
+  const q = query(
+    collection(db, SCHEDULED_COLLECTION),
+    where('userId', '==', userId),
+    orderBy('scheduledAt', 'asc')
+  )
+  const snap = await getDocs(q)
+  return snap.docs.map((d) => {
+    const data = d.data()
+    return {
+      id: d.id,
+      userId: data.userId,
+      tenantId: data.tenantId,
+      generationId: data.generationId,
+      connectionId: data.connectionId,
+      platform: data.platform,
+      imageUrls: data.imageUrls || [],
+      caption: data.caption,
+      scheduledAt: toDateSafe(data.scheduledAt),
+      publishedAt: data.publishedAt ? toDateSafe(data.publishedAt) : undefined,
+      status: data.status,
+      externalPostId: data.externalPostId,
+      externalUrl: data.externalUrl,
+      errorMessage: data.errorMessage,
+      retryCount: data.retryCount || 0,
+      createdAt: toDateSafe(data.createdAt),
+      updatedAt: toDateSafe(data.updatedAt),
+    } as ScheduledPost
+  })
+}
+
+// ==================== SHARED GENERATIONS (client-side read) ====================
+
+const SHARES_COLLECTION = 'shared_generations'
+
+export async function getSharesByUser(userId: string): Promise<SharedGeneration[]> {
+  const q = query(
+    collection(db, SHARES_COLLECTION),
+    where('sharedBy', '==', userId),
+    orderBy('createdAt', 'desc')
+  )
+  const snap = await getDocs(q)
+  return snap.docs.map((d) => {
+    const data = d.data()
+    return {
+      id: d.id,
+      generationId: data.generationId,
+      sharedBy: data.sharedBy,
+      sharedWith: data.sharedWith || [],
+      publicLink: data.publicLink,
+      publicLinkEnabled: data.publicLinkEnabled || false,
+      expiresAt: data.expiresAt ? toDateSafe(data.expiresAt) : undefined,
+      createdAt: toDateSafe(data.createdAt),
+    } as SharedGeneration
+  })
+}
+
+// ==================== COMMENTS (client-side read) ====================
+
+const COMMENTS_COLLECTION = 'image_comments'
+
+export async function getCommentsByGeneration(generationId: string): Promise<ImageComment[]> {
+  const q = query(
+    collection(db, COMMENTS_COLLECTION),
+    where('generationId', '==', generationId),
+    orderBy('createdAt', 'asc')
+  )
+  const snap = await getDocs(q)
+  return snap.docs.map((d) => {
+    const data = d.data()
+    return {
+      id: d.id,
+      generationId: data.generationId,
+      imageIndex: data.imageIndex,
+      userId: data.userId,
+      userName: data.userName,
+      userAvatar: data.userAvatar,
+      content: data.content,
+      pinX: data.pinX,
+      pinY: data.pinY,
+      parentId: data.parentId,
+      resolved: data.resolved || false,
+      createdAt: toDateSafe(data.createdAt),
+      updatedAt: toDateSafe(data.updatedAt),
+    } as ImageComment
+  })
+}
+
+// ==================== APPROVAL REQUESTS (client-side read) ====================
+
+const APPROVALS_COLLECTION = 'approval_requests'
+
+export async function getApprovalsByUser(userId: string): Promise<ApprovalRequest[]> {
+  const q = query(
+    collection(db, APPROVALS_COLLECTION),
+    where('requestedBy', '==', userId),
+    orderBy('createdAt', 'desc')
+  )
+  const snap = await getDocs(q)
+  return snap.docs.map((d) => {
+    const data = d.data()
+    return {
+      id: d.id,
+      generationId: data.generationId,
+      requestedBy: data.requestedBy,
+      requestedByName: data.requestedByName,
+      reviewers: (data.reviewers || []).map((r: Record<string, unknown>) => ({
+        ...r,
+        reviewedAt: r.reviewedAt ? toDateSafe(r.reviewedAt) : undefined,
+      })),
+      status: data.status,
+      dueDate: data.dueDate ? toDateSafe(data.dueDate) : undefined,
+      message: data.message,
+      createdAt: toDateSafe(data.createdAt),
+      updatedAt: toDateSafe(data.updatedAt),
+    } as ApprovalRequest
+  })
 }

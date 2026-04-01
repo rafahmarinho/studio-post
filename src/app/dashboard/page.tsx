@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useAuth } from '@/lib/auth-context'
 import { useCreative } from '@/hooks/use-creative'
 import { Card, CardContent } from '@/components/ui/card'
@@ -108,10 +109,11 @@ export default function DashboardPage() {
                 <Card key={g.id} className="overflow-hidden hover-lift group">
                   {g.generatedImageUrls[0] && (
                     <div className="aspect-video relative bg-muted overflow-hidden">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
+                      <Image
                         src={g.generatedImageUrls[0]}
                         alt="Preview"
+                        width={400}
+                        height={225}
                         className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
                       />
                     </div>

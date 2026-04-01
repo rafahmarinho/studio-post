@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import { useAuth } from '@/lib/auth-context'
 import { useCreative } from '@/hooks/use-creative'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
@@ -199,10 +200,11 @@ export default function HistoryPage() {
                                 })
                               }
                             >
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img
+                              <Image
                                 src={url}
                                 alt={`Image ${i + 1}`}
+                                width={200}
+                                height={200}
                                 className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
                               />
                             </div>

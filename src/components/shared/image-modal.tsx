@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useCallback } from 'react'
+import Image from 'next/image'
 import {
   Dialog,
   DialogContent,
@@ -176,9 +177,11 @@ export function ImageModal({
               onMouseUp={handleMouseUp}
               onMouseLeave={handleMouseUp}
             >
-              <img
+              <Image
                 src={currentUrl}
                 alt={`Imagem ${imageIndex + 1}`}
+                width={1024}
+                height={1024}
                 className="max-w-full max-h-[60vh] object-contain select-none"
                 style={{
                   transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
